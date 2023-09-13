@@ -11,7 +11,8 @@ export default {
       },
       colors: {
         pink: '#FBA1B7',
-        black: '#3a3a3a'
+        black: '#3a3a3a',
+        'light-pink': '#FDE5EC',
       },
       fontFamily: {
         hayward: 'Hayward',
