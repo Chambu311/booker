@@ -47,6 +47,10 @@ export const authOptions: NextAuthOptions = {
     }),
   },
   adapter: PrismaAdapter(prisma),
+  pages: {
+    signIn: '/auth/login',
+    signOut: '/auth/login',
+  },
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")
