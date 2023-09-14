@@ -1,26 +1,25 @@
 import Link from "next/link";
-
+import { signOut, useSession } from "next-auth/react";
 export default function Navbar() {
+  const session = useSession();
   return (
-    <div className="bg-pink min-h-10 font-montserrat fixed top-0 z-[999] flex w-full p-5 px-10 align-middle text-white">
+    <div className="min-h-10 fixed top-0 z-[999] flex w-full bg-pink p-5 px-10 align-middle font-montserrat text-white">
       <div className="my-auto flex w-[80%] justify-center gap-20">
-        <div className="font-hayward absolute bottom-0 left-5 top-0 text-[45px] text-white">
-          Booker
+        <div
+          className="link text-white"
+          onClick={() => {
+            void signOut({ callbackUrl: "/" });
+          }}
+        >
+          Salir
         </div>
-        <Link href="/library">
-          <div className="link text-white">Libreria</div>
-        </Link>
-        <div className="link text-white">Pedidos</div>
-        <Link href="/">
-          <div className="link text-white">Salir</div>
-        </Link>
       </div>
       <div className="flex w-[20%] gap-5 align-middle">
         <div className="grid place-content-center rounded-full border border-white p-2 ">
           <div className="mdi mdi-account text-[30px] text-white"></div>
         </div>
         <div className="flex flex-col">
-          <div className="m-auto text-white">@ Anomander</div>
+          <div className="m-auto text-white">@ {session.data?.user.name}</div>
         </div>
       </div>
       <style jsx>
