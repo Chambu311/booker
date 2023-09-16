@@ -1,4 +1,7 @@
 import { useRouter } from "next/router";
+import { mdiBookmarkBoxMultiple, mdiTrashCan } from "@mdi/js";
+import MdIcon from "./mdIcon";
+import { api } from "~/utils/api";
 
 interface ICollection {
   name: string;
@@ -7,13 +10,33 @@ interface ICollection {
 
 export default function CollectionCard(props: ICollection) {
   const router = useRouter();
+  const trpc = api.useContext();
+  const deleteMutation = api.catalog.deleteCatalog.useMutation({
+    onSettled: async () => {
+      await trpc.catalog.getAllByUserId.invalidate()
+    },
+  });
+
+  function onClickDeleteCatalog(id: string, event: any) {
+    event.stopPropagation();
+    deleteMutation.mutate({ id });
+  }
   return (
     <div
-      className="rounded-normal card relative flex h-[200px] w-[180px] cursor-pointer flex-col shadow-lg"
-      onClick={() => void router.push(`/profile/catalog/${props.id}`)}
+      className="card relative flex h-[200px] w-[180px] cursor-pointer flex-col rounded-normal bg-light-pink shadow-lg"
+      onClick={() => router.push(`/profile/library/${props.id}`)}
     >
-      <div className="rounded-t-normal flex h-[40%] w-full justify-center bg-light-pink">
-        <span className="my-auto text-[24px] text-black">{props.name}</span>
+      <div className="absolute right-2 top-2">
+        <MdIcon path={mdiBookmarkBoxMultiple} color="black" size={1} />
+      </div>
+      <div
+        className="absolute left-2 top-2"
+        onClick={(e) => onClickDeleteCatalog(props.id, e)}
+      >
+        <MdIcon path={mdiTrashCan} color="red" size={1} />
+      </div>
+      <div className="absolute bottom-2 left-2 text-[20px]">
+        <span>{props.name}</span>
       </div>
       <style jsx>
         {`

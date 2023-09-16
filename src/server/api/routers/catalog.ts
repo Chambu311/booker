@@ -23,17 +23,28 @@ export const catalogRouter = createTRPCRouter({
       });
     }),
   createCatalog: protectedProcedure
-    .input(z.object({ name: z.string(), userId: z.string(), description: z.string() }))
+    .input(
+      z.object({
+        name: z.string(),
+        userId: z.string(),
+        description: z.string(),
+      }),
+    )
     .mutation(async (opts) => {
       const { input } = opts;
       const { ctx } = opts;
       const newCatalog = await ctx.prisma.catalog.create({
         data: {
-            name: input.name,
-            userId: input.userId,
-            description: input.description,
-        }
+          name: input.name,
+          userId: input.userId,
+          description: input.description,
+        },
       });
-      return newCatalog
+      return newCatalog;
+    }),
+  deleteCatalog: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async (opts) => {
+      await opts.ctx.prisma.catalog.delete({ where: { id: opts.input.id } });
     }),
 });

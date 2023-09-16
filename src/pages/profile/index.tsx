@@ -6,7 +6,7 @@ import Image from "next/image";
 import { mdiBookmarkBoxMultiple } from "@mdi/js";
 import { mdiSwapHorizontalCircleOutline } from "@mdi/js";
 import { useState } from "react";
-import CatalogView from "~/components/catalog-view";
+import LibraryView from "~/components/library-view";
 
 const Profile = () => {
   const [tab, setTab] = useState<number>(0);
@@ -78,7 +78,7 @@ const Profile = () => {
           </div>
           <div className="w-[80%] flex-col p-10 rounded-normal shadow-normal">
             {tab === 0 ? (
-              <CatalogView
+              <LibraryView
                 userId={session.data?.user.id ? session.data.user.id : ""}
               />
             ) : null}

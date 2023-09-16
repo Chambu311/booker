@@ -9,7 +9,7 @@ interface INavbar {
 export default function Navbar(props: INavbar) {
   const session = useSession();
   return (
-    <div className="justify-betwee fixed top-0 flex h-[80px] w-full items-center bg-pink font-montserrat text-white">
+    <div className="justify-between fixed top-0 z-50  flex h-[80px] w-full items-center bg-pink font-montserrat text-white">
       <Link href="/home">
         <div className="absolute left-5 top-0 cursor-pointer font-hayward text-[40px]">
           Booker

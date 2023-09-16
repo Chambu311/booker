@@ -24,8 +24,12 @@ export default {
         normal: '0px 2px 5px #d9d9d9',
       },
       borderRadius: {
-        normal: '10px'
-      }
+        normal: '10px',
+        small: '5px',
+      },
+    transitionProperty: {
+        'opacity-button': 'ease 0.7s'
+    }
     },
   },
   plugins: [],
