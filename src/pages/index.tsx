@@ -13,11 +13,9 @@ export const getServerSideProps: GetServerSideProps = async (
     return {
       redirect: { destination: "/auth/signin", permanent: false },
     };
+  } else {
+    return {
+        redirect: { destination: '/home', permanent: false}
+    }
   }
-
-  return {
-    props: {
-      session,
-    },
-  };
 };

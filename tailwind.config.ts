@@ -13,10 +13,18 @@ export default {
         pink: '#FBA1B7',
         black: '#3a3a3a',
         'light-pink': '#FDE5EC',
+        grey: '#D3D3D3',
+        platinum: '#E5E4E2'
       },
       fontFamily: {
         hayward: 'Hayward',
         montserrat: 'Montserrat',
+      },
+      boxShadow: {
+        normal: '0px 2px 5px #d9d9d9',
+      },
+      borderRadius: {
+        normal: '10px'
       }
     },
   },

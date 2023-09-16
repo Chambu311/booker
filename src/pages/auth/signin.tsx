@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import { signOut, useSession, signIn, getProviders } from "next-auth/react";
 import { getServerSession } from "next-auth/next"
@@ -9,7 +5,6 @@ import { authOptions } from "~/server/auth";
 const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   providers,
 }) => {
-  const session = useSession();
   return (
     <main className="flex h-[100vh] overflow-y-hidden bg-white font-montserrat">
       <div className="relative h-full w-[70%] bg-login bg-cover bg-no-repeat"></div>
