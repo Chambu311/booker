@@ -20,7 +20,11 @@ export default function Navbar(props: INavbar) {
           className="flex gap-4 align-middle"
           onSubmit={props.onSearchSubmit}
         >
-          <label htmlFor="search my-auto">
+          <input
+            className="h-[30px] w-[300px] rounded-[5px] px-3 text-black focus:outline-black"
+            placeholder="The lord of the rings"
+          />
+          <label htmlFor="search my-auto items-center">
             <MdIcon
               path={mdiMagnify}
               color="white"
@@ -28,10 +32,6 @@ export default function Navbar(props: INavbar) {
               className="scale-[1.3]"
             />
           </label>
-          <input
-            className="h-[30px] w-[300px] rounded-[5px] px-3 focus:outline-black"
-            placeholder="The lord of the rings"
-          />
         </form>
       </div>
       <div className="flex w-[20%] gap-5 text-white">
@@ -48,7 +48,7 @@ export default function Navbar(props: INavbar) {
             <MdIcon path={mdiAccount} size={1} color={"white"} />
           )}
         </div>
-        <Link href={`/profile`} className="my-auto">
+        <Link href={`/my-profile`} className="my-auto">
           <div className="text-xl">@{session.data?.user.name}</div>
         </Link>
         <div

@@ -1,7 +1,9 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
-import { signOut, useSession, signIn, getProviders } from "next-auth/react";
+import { GetServerSidePropsContext, NextPage } from "next";
+import { signIn, getProviders } from "next-auth/react";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "~/server/auth";
+import { mdiGithub, mdiGoogle} from '@mdi/js';
+import MdIcon from "~/components/mdIcon";
 const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   providers,
 }) => {
@@ -13,15 +15,15 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
           <div className="text-center font-hayward text-[70px] text-pink">
             Booker
           </div>
-          <div className="flex justify-center">
+          <div className="flex flex-col gap-5 items-center">
             {providers &&
               Object.values(providers).map((provider: any) => (
                 <div key={provider?.name} style={{ marginBottom: 0 }}>
                   <button
-                    className="flex items-center login-btn bg-pink p-5 text-white rounded-[10px] font-bold font-lg"
+                    className="flex items-center gap-3 login-btn bg-pink p-5 text-white rounded-[10px] font-bold font-lg"
                     onClick={() => signIn(provider.id, { callbackUrl: "/home" })}
                   >
-                    <div className="mdi mdi-github text-white"></div>
+                    <MdIcon path={provider.name.includes('GitHub') ? mdiGithub : mdiGoogle} color="white" size={1} /> 
                     Sign in with {provider.name}{" "}
                   </button>
                 </div>

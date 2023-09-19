@@ -51,8 +51,8 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    catalogs      Catalog[]
-    role          Role       @default(USER)
+    role          Role      @default(USER)
+    books         Book[]
 }
 
 model VerificationToken {
@@ -63,31 +63,31 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model Catalog {
-    id           String        @id @default(cuid())
-    name         String
-    description  String        @default("Mi catálogo")
-    createdAt    DateTime      @default(now())
-    catalogBooks CatalogBook[]
-    user         User          @relation(fields: [userId], references: [id])
-    userId       String
-
-    @@index([userId])
-}
-
 model Book {
-    id                 String            @id @default(cuid())
-    title              String
-    author             String
-    genre              Genre             @relation(fields: [genreId], references: [id])
-    genreId            String
-    type               BookType          @relation(fields: [typeId], references: [id])
-    typeId             String
-    catalogAssociation CatalogBook[]
-    publications       BookPublication[]
+    id           String            @id @default(cuid())
+    title        String
+    author       String
+    genre        Genre             @relation(fields: [genreId], references: [id])
+    genreId      String
+    type         BookType          @relation(fields: [typeId], references: [id])
+    typeId       String
+    publications BookPublication[]
+    user         User              @relation(fields: [userId], references: [id])
+    userId       String
 
     @@index([genreId])
     @@index([typeId])
+    @@index([userId])
+}
+
+model PublicationImage {
+    id     String @id @default(cuid())
+    src    String
+    publication BookPublication @relation(fields: [publicationId], references: [id])
+    publicationId String
+
+
+    @@index([publicationId])
 }
 
 model BookPublication {
@@ -98,18 +98,8 @@ model BookPublication {
     bookId    String
     book      Book     @relation(fields: [bookId], references: [id])
     comment   String
+    images PublicationImage[]
 
-    @@index([bookId])
-}
-
-model CatalogBook {
-    id        String  @id @default(cuid())
-    catalog   Catalog @relation(fields: [catalogId], references: [id])
-    catalogId String
-    book      Book    @relation(fields: [bookId], references: [id])
-    bookId    String
-
-    @@index([catalogId])
     @@index([bookId])
 }
 

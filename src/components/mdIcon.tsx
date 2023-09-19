@@ -8,5 +8,6 @@ interface IconProps {
   spin?: boolean;
 }
 export default function MdIcon(props: IconProps) {
+
   return <Icon path={props.path} size={props.size} color={props.color} className={props.className} spin={props.spin} />;
 }
