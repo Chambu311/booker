@@ -1,9 +1,9 @@
 import { exampleRouter } from "~/server/api/routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { userRouter } from "./routers/user";
-import { catalogRouter } from "./routers/catalog";
 import { bookRouter } from "./routers/book";
 import { genreRouter } from "./routers/genre";
+import { publicationRouter } from "./routers/bookPublication";
 
 /**
  * This is the primary router for your server.
@@ -13,8 +13,8 @@ import { genreRouter } from "./routers/genre";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   user: userRouter,
-  catalog: catalogRouter,
   book: bookRouter,
+  publication: publicationRouter,
   genre: genreRouter
 });
 

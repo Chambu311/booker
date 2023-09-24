@@ -23,6 +23,10 @@ const config = {
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'booker-tesis.s3.amazonaws.com',
+      },
     ],
   },
 };

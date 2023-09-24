@@ -5,7 +5,6 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { catalogRouter } from "./catalog";
 import { genreRouter } from "./genre";
 import { PrismaClient } from "@prisma/client";
 
@@ -17,6 +16,9 @@ export const bookRouter = createTRPCRouter({
         where: {
           userId: input.userId,
         },
+        include: {
+            publications: true,
+        }
       });
     }),
   createBook: protectedProcedure
@@ -44,6 +46,9 @@ export const bookRouter = createTRPCRouter({
     }),
     deleteBook: protectedProcedure.input(z.object({ id: z.string()})).mutation( async ({ctx, input}) => {
         return await ctx.prisma.book.delete({ where: { id: input.id}})
+    }),
+    findById: protectedProcedure.input(z.object({id: z.string()})).query( async ({ctx, input}) => {
+        return await ctx.prisma.book.findUnique({ where: { id: input.id }})
     })
 });
 

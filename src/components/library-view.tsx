@@ -1,14 +1,16 @@
-import { mdiAccount, mdiPlus, mdiArrowLeft, mdiLoading } from "@mdi/js";
+import { mdiAccount, mdiPlus, mdiArrowLeft, mdiLoading, mdiCheck } from "@mdi/js";
 import MdIcon from "./mdIcon";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import Modal from "./modal";
 import BookCard from "./book-card";
 import { Book } from "@prisma/client";
+import { useRouter } from "next/router";
+
 
 export default function LibraryView(props: { userId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
   const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<string>("");
   const genreListQuery = api.genre.getAll.useQuery();
@@ -20,7 +22,6 @@ export default function LibraryView(props: { userId: string }) {
   const bookList = bookQuery.data;
 
   function onClickDeleteBook(id: string) {
-    console.log("clicked");
     setBookToDelete(id);
     setIsDeleteBookModalOpen(true);
   }
@@ -29,7 +30,7 @@ export default function LibraryView(props: { userId: string }) {
     deleteBookMutation.mutate(
       { id: bookToDelete },
       {
-        async onSuccess(data, variables, context) {
+        async onSuccess() {
           setIsDeleteBookModalOpen(false);
           await bookQuery.refetch();
         },
@@ -51,7 +52,7 @@ export default function LibraryView(props: { userId: string }) {
         userId: props.userId,
       },
       {
-        async onSuccess(data, variables, context) {
+        async onSuccess() {
           await bookQuery.refetch();
         },
       },
@@ -77,14 +78,18 @@ export default function LibraryView(props: { userId: string }) {
           </span>
         </div>
       </div>
-      {!bookQuery.isLoading ? (
+      {!bookQuery.isLoading || !bookQuery.isRefetching ? (
         <div className="grid h-full w-full grid-cols-3 gap-5 p-5">
           {bookList?.map((book: Book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              onClickDelete={onClickDeleteBook}
-            />
+            <div className="cursor-pointer relative w-[200px]" key={book.id} onClick={() => router.push(`/my-profile/${book.id}`)}>
+              <BookCard
+                book={book}
+                onClickDelete={onClickDeleteBook}
+              />
+              <div className={`absolute -top-2 -right-2 grid place-content-center rounded-[50%] p-1 bg-green-400`}>
+                <MdIcon path={mdiCheck} color="white" size={1} />
+              </div>
+            </div>
           ))}
         </div>
       ) : (

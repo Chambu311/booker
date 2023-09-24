@@ -19,13 +19,14 @@ export const env = createEnv({
       (str) => process.env.VERCEL_URL ?? str,
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
       process.env.VERCEL ? z.string().min(1) : z.string().url(),
-      
-      ),
-      // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
-      GOOGLE_ID: z.string(),
-      GOOGLE_SECRET: z.string(),
-      GITHUB_CLIENT_ID: z.string(),
-      GITHUB_CLIENT_SECRET: z.string(),
+    ),
+    // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
+    GOOGLE_ID: z.string(),
+    GOOGLE_SECRET: z.string(),
+    GITHUB_CLIENT_ID: z.string(),
+    GITHUB_CLIENT_SECRET: z.string(),
+    AWS_ACCESS_KEY_ID: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
   },
 
   /**
@@ -50,6 +51,8 @@ export const env = createEnv({
     GOOGLE_SECRET: process.env.GOOGLE_SECRET,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
