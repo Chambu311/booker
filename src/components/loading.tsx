@@ -24,6 +24,8 @@ export const LoadingSpinner = () => {
 
 export const LoadingPage = () => {
     return (
-        <div className="absolute w-screen h-screen top-0 bottom-0 "></div>
+        <div className="absolute w-screen h-screen grid place-content-center top-0 bottom-0">
+            <LoadingSpinner />
+        </div>
     )
 }

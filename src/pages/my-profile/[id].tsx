@@ -12,6 +12,7 @@ import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
 import MdIcon from "~/components/mdIcon";
 import { useRouter } from "next/router";
+import { LoadingPage } from "~/components/loading";
 
 export default function PublishBook(props: { book: Book }) {
   const [fileList, setFileList] = useState<FileList | null>();
@@ -25,6 +26,8 @@ export default function PublishBook(props: { book: Book }) {
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     setFileList(e.target.files);
   }
+
+  if (publicationQuery.isLoading) return <LoadingPage />;
 
   async function handleUploadImages(input: any) {
     input.preventDefault();
@@ -79,31 +82,28 @@ export default function PublishBook(props: { book: Book }) {
           >
             Volver
           </div>
-          {!publicationQuery.isLoading ? (
-            <div className="m-5 w-full rounded-normal p-5 shadow-normal">
-              <h1 className="text-[30px]">{book.title}</h1>
-              <h2 className="text-[25px] italic">{book.author}</h2>
-              <div className="flex gap-10">
-                <div
-                  className={`my-3 w-[200px] rounded-small ${
-                    publication?.isActive ? "bg-green" : "bg-platinum"
-                  } border-[1px] p-1`}
-                >
-                  Estado: {publication?.isActive ? "Publicado" : "No publicado"}
-                </div>
-                {publication?.isActive ? (
-                  <button
-                    type="button"
-                    className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white"
-                  >
-                    Pausar publicación
-                  </button>
-                ) : null}
+
+          <div className="m-5 w-full rounded-normal p-5 shadow-normal">
+            <h1 className="text-[30px]">{book.title}</h1>
+            <h2 className="text-[25px] italic">{book.author}</h2>
+            <div className="flex gap-10">
+              <div
+                className={`my-3 w-[200px] rounded-small ${
+                  publication?.isActive ? "bg-green" : "bg-platinum"
+                } border-[1px] p-1`}
+              >
+                Estado: {publication?.isActive ? "Publicado" : "No publicado"}
               </div>
+              {publication?.isActive ? (
+                <button
+                  type="button"
+                  className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white"
+                >
+                  Pausar publicación
+                </button>
+              ) : null}
             </div>
-          ) : (
-            <div className="absolute bottom-0 left-[50%] h-10 w-10 animate-spin rounded-[50%] border-[2px] border-pink border-t-transparent p-3"></div>
-          )}
+          </div>
           {!publication && !publicationQuery.isLoading ? (
             <form
               className="flex w-[40%] flex-col gap-5 p-5"

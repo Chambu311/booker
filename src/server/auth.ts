@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import GithubProvider from 'next-auth/providers/github';
-import GoogleProvider from 'next-auth/providers/google';
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import CredentialsProviders from "next-auth/providers/credentials";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
@@ -8,9 +10,8 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 
-import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
-import { profile } from "console";
+import bcrypt from "bcryptjs";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -40,30 +41,65 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-        userName: user.name,
-      },
-    }),
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+
+      return token;
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+      }
+
+      return session;
+    },
   },
   pages: {
-    signIn: 'auth/signin'
+    signIn: "auth/signin",
   },
   adapter: PrismaAdapter(prisma),
   providers: [
     GithubProvider({
-        clientId: process.env.GITHUB_CLIENT_ID!,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET!
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
-    GoogleProvider({
-        clientId: process.env.GOOGLE_ID!,
-        clientSecret: process.env.GOOGLE_SECRET!,
-    })
-
-  ]
+    CredentialsProviders({
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "text",
+          placeholder: "juan123@gmail.com",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
+      },
+      authorize: async (credentials): Promise<any> => {
+        if (!credentials?.password || !credentials.email) return;
+        const { email, password } = credentials;
+        const user = await prisma.user.findUnique({
+          where: {
+            email,
+          },
+        });
+        const userPassword = user?.password;
+        if (userPassword) {
+          const isValidPassword = bcrypt.compareSync(password, userPassword);
+          if (isValidPassword) return user;
+        }
+        return null;
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 /**
