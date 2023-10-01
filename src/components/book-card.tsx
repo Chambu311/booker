@@ -1,6 +1,6 @@
 import { mdiPublish, mdiTrashCan, mdiPencil, mdiCheck, mdiHelp } from "@mdi/js";
 import MdIcon from "./mdIcon";
-import { Book, Prisma } from "@prisma/client";
+import { Book, BookPublication, Prisma } from "@prisma/client";
 
 export type BookWithPublications = Prisma.BookGetPayload<{
   include: {
@@ -41,6 +41,25 @@ export default function BookCard(props: IBookCard) {
           <MdIcon path={mdiTrashCan} color="black" size={1} />
         </div>
       </div>
+    </div>
+  );
+}
+
+export type PublicationData = Prisma.BookPublicationGetPayload<{
+  include: {
+    images: true;
+    book: true;
+  };
+}>;
+
+export function PublicationCard(props: { publication: PublicationData }) {
+  const { publication } = props;
+  return (
+    <div className="flex h-[300px] w-[400px] flex-col rounded-normal align-middle shadow-lg">
+      <div
+        style={{ backgroundImage: `url('${publication.images[0]?.src}')` }}
+        className="h-[70%] w-full rounded-t-normal bg-light-pink bg-contain bg-center bg-no-repeat"
+      />
     </div>
   );
 }

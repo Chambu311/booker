@@ -21,9 +21,9 @@ export const publicationRouter = createTRPCRouter({
       return await ctx.prisma.bookPublication.findFirst({
         where: { bookId: input.id },
         include: {
-            book: true,
-            images: true,
-        }
+          book: true,
+          images: true,
+        },
       });
     }),
   createPublication: protectedProcedure
@@ -44,17 +44,40 @@ export const publicationRouter = createTRPCRouter({
       });
       await createPublicationImages(ctx.prisma, newPublication.id, input.imgs);
     }),
-    pausePublication: protectedProcedure.input(z.object({ isActive: z.boolean(), id: z.string()})).mutation(async({ctx,input}) => {
-        const foundPub = await ctx.prisma.bookPublication.findUnique({ where: { id: input.id}})
-        if (foundPub) {
-            await ctx.prisma.bookPublication.create({
-                data: {
-                    ...foundPub,
-                    isActive: input.isActive
-                }
-            })
-        }
-    })
+  pausePublication: protectedProcedure
+    .input(z.object({ isActive: z.boolean(), id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const foundPub = await ctx.prisma.bookPublication.findUnique({
+        where: { id: input.id },
+      });
+      if (foundPub) {
+        await ctx.prisma.bookPublication.create({
+          data: {
+            ...foundPub,
+            isActive: input.isActive,
+          },
+        });
+      }
+    }),
+  getFeedPublications: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const pubs = await ctx.prisma.bookPublication.findMany({
+        where: {
+          book: {
+            userId: {
+              not: input.id,
+            },
+          },
+          isActive: true,
+        },
+        include: {
+          book: true,
+          images: true,
+        },
+      });
+      return pubs;
+    }),
 });
 
 async function createPublicationImages(
