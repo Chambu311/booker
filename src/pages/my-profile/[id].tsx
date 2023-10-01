@@ -34,8 +34,8 @@ export default function PublishBook(props: { book: Book }) {
       return;
     }
     AWS.config.update({
-      accessKeyId: "AKIAZO5K35H4SPMDHNX3",
-      secretAccessKey: "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",
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     });
     const s3 = new S3();
     const formData = new FormData(input.target);
