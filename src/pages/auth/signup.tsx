@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 
 export default function SignUp() {
@@ -20,7 +21,7 @@ export default function SignUp() {
         },
         onError: () => {
           e.target.reset();
-          window.alert("Error al registrarse");
+          window.alert("El usuario ya existe");
         },
       },
     );
@@ -55,10 +56,19 @@ export default function SignUp() {
           />
           <button
             type="submit"
-            className="mt-10 rounded-small bg-pink p-3 text-[18px] font-bold text-white"
+            className="mt-10 rounded-small bg-pink p-3 justify-center text-[18px] flex font-bold text-white"
           >
-            Registrarse
+            {createUser.isLoading ? (
+                <div className="flex gap-5">
+                    Registrando <LoadingSpinner color="border-white" />
+                </div>
+            ) : (
+                <div className="">Registrarse</div>
+            )}
           </button>
+          <div className="flex justify-center italic cursor-pointer" onClick={() => router.push('/')}>
+            Ya tengo cuenta
+          </div>
         </form>
       </div>
     </div>

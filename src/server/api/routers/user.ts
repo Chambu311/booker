@@ -5,6 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { error } from "console";
 
 export const userRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
@@ -22,11 +23,10 @@ export const userRouter = createTRPCRouter({
   createUser: publicProcedure
     .input(z.object({ email: z.string(), password: z.string(), name: z.string() }))
     .mutation(async ({ ctx, input }) => {
-        console.log('im here', input);
       const doesUserExist = await ctx.prisma.user.findUnique({
         where: { email: input.email },
       });
-      if (doesUserExist) return;
+      if (doesUserExist) throw error;
       const newUser = await ctx.prisma.user.create({
         data: {
           email: input.email,
@@ -36,7 +36,6 @@ export const userRouter = createTRPCRouter({
           emailVerified: new Date(),
         },
       });
-      console.log('new user', newUser);
       return newUser;
     }),
 });

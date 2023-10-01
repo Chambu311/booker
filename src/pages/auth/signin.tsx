@@ -5,30 +5,35 @@ import { authOptions } from "~/server/auth";
 import { mdiGithub, mdiGoogle } from "@mdi/js";
 import MdIcon from "~/components/mdIcon";
 import { useState } from "react";
+import { useRouter } from "next/router";
 const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   providers,
 }) => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   async function handleSubmit() {
     try {
-        const userFound = await signIn("credentials", {
-          email,
-          password,
-          callbackUrl: '/home'
-        });
-        console.log("reponse", userFound);
+      const userFound = await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: "/home",
+      });
+      console.log("reponse", userFound);
     } catch (error) {
-        console.log('error', error);
-        window.alert('Invalid credentials')
+      console.log("error", error);
+      window.alert("Invalid credentials");
     }
   }
   return (
     <main className="flex h-[100vh] overflow-y-hidden bg-white font-montserrat">
       <div className="relative h-full w-[70%] bg-login bg-cover bg-no-repeat"></div>
-      <div className="flex h-full w-[30%] justify-center bg-white p-10 relative">
-        <div className="absolute left-3 bottom-5 p-2 rounded-small bg-platinum">
-            ¿No tienes cuenta? Registrate aquí.
+      <div className="relative flex h-full w-[30%] justify-center bg-white p-10">
+        <div
+          className="absolute bottom-5 left-3 cursor-pointer rounded-small bg-platinum p-2"
+          onClick={() => router.push("/auth/signup")}
+        >
+          No tengo cuenta
         </div>
         <div className="flex flex-col gap-10">
           <div className="text-center font-hayward text-[70px] text-pink">
