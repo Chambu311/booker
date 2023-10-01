@@ -14,7 +14,8 @@ export default {
         black: '#3a3a3a',
         'light-pink': '#FDE5EC',
         grey: '#D3D3D3',
-        platinum: '#E5E4E2'
+        platinum: '#E5E4E2',
+        green :"#a0d911",
       },
       fontFamily: {
         hayward: 'Hayward',

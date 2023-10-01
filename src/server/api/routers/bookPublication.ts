@@ -31,18 +31,30 @@ export const publicationRouter = createTRPCRouter({
       z.object({
         bookId: z.string(),
         imgs: z.string().array(),
+        comment: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const newPublication = await ctx.prisma.bookPublication.create({
         data: {
           bookId: input.bookId,
-          comment: "Nueva publicación",
+          comment: input.comment,
           isActive: true,
         },
       });
       await createPublicationImages(ctx.prisma, newPublication.id, input.imgs);
     }),
+    pausePublication: protectedProcedure.input(z.object({ isActive: z.boolean(), id: z.string()})).mutation(async({ctx,input}) => {
+        const foundPub = await ctx.prisma.bookPublication.findUnique({ where: { id: input.id}})
+        if (foundPub) {
+            await ctx.prisma.bookPublication.create({
+                data: {
+                    ...foundPub,
+                    isActive: input.isActive
+                }
+            })
+        }
+    })
 });
 
 async function createPublicationImages(

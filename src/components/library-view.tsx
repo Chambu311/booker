@@ -3,7 +3,7 @@ import MdIcon from "./mdIcon";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import Modal from "./modal";
-import BookCard from "./book-card";
+import BookCard, { BookWithPublications } from "./book-card";
 import { Book } from "@prisma/client";
 import { useRouter } from "next/router";
 
@@ -80,15 +80,12 @@ export default function LibraryView(props: { userId: string }) {
       </div>
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
         <div className="grid h-full w-full grid-cols-3 gap-5 p-5">
-          {bookList?.map((book: Book) => (
+          {bookList?.map((book: BookWithPublications) => (
             <div className="cursor-pointer relative w-[200px]" key={book.id} onClick={() => router.push(`/my-profile/${book.id}`)}>
               <BookCard
                 book={book}
                 onClickDelete={onClickDeleteBook}
               />
-              <div className={`absolute -top-2 -right-2 grid place-content-center rounded-[50%] p-1 bg-green-400`}>
-                <MdIcon path={mdiCheck} color="white" size={1} />
-              </div>
             </div>
           ))}
         </div>
