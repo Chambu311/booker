@@ -21,7 +21,7 @@ const Profile = () => {
       <header className="pb-20">
         <Navbar />
       </header>
-      <div className="h-full w-full p-10 font-montserrat">
+      <div className="w-full p-10 font-montserrat bg-white h-screen">
         <div className="flex gap-10">
           <div className="flex w-[20%] flex-col">
             <div className="shadow-normal w-full flex-col rounded-[10px] px-10 py-10">

@@ -39,9 +39,6 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
           <div className="text-center font-hayward text-[70px] text-pink">
             Booker
           </div>
-          <div className="text-center text-[25px] font-bold">
-            Iniciar sesion
-          </div>
           <div className="flex flex-col items-center gap-5">
             <div className="">
               <div className="flex flex-col gap-5">

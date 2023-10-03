@@ -54,12 +54,17 @@ export type PublicationData = Prisma.BookPublicationGetPayload<{
 
 export function PublicationCard(props: { publication: PublicationData }) {
   const { publication } = props;
+  const book = publication.book;
   return (
-    <div className="flex h-[300px] w-[400px] flex-col rounded-normal align-middle shadow-lg">
+    <div className="flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal font-montserrat align-middle shadow-lg">
       <div
         style={{ backgroundImage: `url('${publication.images[0]?.src}')` }}
-        className="h-[70%] w-full rounded-t-normal bg-light-pink bg-contain bg-center bg-no-repeat"
+        className="h-[70%] w-full rounded-t-normal bg-peach bg-contain bg-center bg-no-repeat"
       />
+      <div className="p-3 flex flex-col">
+        <span className="text-black font-bold">{book.title}</span>
+        <span className="text-black font-normal text-sm italic">{book.author}</span>
+      </div>
     </div>
   );
 }

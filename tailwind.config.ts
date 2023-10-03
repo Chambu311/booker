@@ -10,12 +10,18 @@ export default {
         register: "url('../../public/register-bg.webp')"
       },
       colors: {
-        pink: '#FBA1B7',
+        pink: '#FF90BB',
         black: '#3a3a3a',
         'light-pink': '#FDE5EC',
         grey: '#D3D3D3',
         platinum: '#E5E4E2',
         green :"#a0d911",
+        cream: "#FBF4EA",
+        lavender: "#E6D6F5",
+        blue: "#ECF7FF",
+        peach: "#F8EEEB",
+        purple: "#9376E0",
+        "dark-purple": "#2A2F4F",
       },
       fontFamily: {
         hayward: 'Hayward',
@@ -35,3 +41,5 @@ export default {
   },
   plugins: [],
 } satisfies Config;
+
+// pink: '#FBA1B7',
