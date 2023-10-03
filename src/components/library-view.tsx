@@ -48,7 +48,7 @@ export default function LibraryView(props: { userId: string }) {
       {
         title,
         author,
-        genre,
+        genre: genre,
         userId: props.userId,
       },
       {
