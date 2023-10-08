@@ -41,11 +41,9 @@ export default function PublicationDetail(props: {
               ))}
             </Carousel>
           </div>
-          <div className="flex w-[50%] flex-col relative gap-y-3 rounded-normal p-10 shadow-lg">
-            <div className="flex justify-end">
-              <div className="my-3 w-[50%] rounded-small border-[1px] border-black p-3 text-black shadow-lg">
-                <span>@{userQuery?.data?.name ?? userQuery?.data?.email}</span>
-              </div>
+          <div className="relative flex w-[50%] flex-col gap-y-3 rounded-normal p-10 shadow-lg">
+            <div className="my-3 text-black italic">
+              <span>@{userQuery?.data?.name ?? userQuery?.data?.email}</span>
             </div>
             <div className="font-montserrat text-[27px] text-black">
               <b>Titulo: </b>
@@ -55,11 +53,11 @@ export default function PublicationDetail(props: {
               <b>Autor: </b>
               {book?.author}
             </div>
-            <div className="flex absolute gap-x-5 bottom-5">
-              <button className="rounded-normal border-[1px] border-pink p-2 text-pink text-[18px]">
+            <div className="absolute bottom-5 flex gap-x-5">
+              <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
                 Enviar solicitud de intercambio
               </button>
-              <button className="rounded-normal border-[1px] border-pink p-2 text-pink text-[18px]">
+              <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
                 Ver mas publicaciones del usuario
               </button>
             </div>
