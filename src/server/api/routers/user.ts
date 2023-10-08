@@ -21,7 +21,9 @@ export const userRouter = createTRPCRouter({
       });
     }),
   createUser: publicProcedure
-    .input(z.object({ email: z.string(), password: z.string(), name: z.string() }))
+    .input(
+      z.object({ email: z.string(), password: z.string(), name: z.string() }),
+    )
     .mutation(async ({ ctx, input }) => {
       const doesUserExist = await ctx.prisma.user.findUnique({
         where: { email: input.email },
@@ -32,10 +34,15 @@ export const userRouter = createTRPCRouter({
           email: input.email,
           password: await bycrypt.hash(input.password, 10),
           name: input.name,
-          role: 'USER',
+          role: "USER",
           emailVerified: new Date(),
         },
       });
       return newUser;
+    }),
+  findById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.user.findUnique({ where: { id: input.id } });
     }),
 });

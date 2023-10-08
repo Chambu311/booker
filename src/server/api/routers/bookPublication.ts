@@ -47,17 +47,14 @@ export const publicationRouter = createTRPCRouter({
   pausePublication: protectedProcedure
     .input(z.object({ isActive: z.boolean(), id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const foundPub = await ctx.prisma.bookPublication.findUnique({
-        where: { id: input.id },
+      await ctx.prisma.bookPublication.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          isActive: input.isActive,
+        },
       });
-      if (foundPub) {
-        await ctx.prisma.bookPublication.create({
-          data: {
-            ...foundPub,
-            isActive: input.isActive,
-          },
-        });
-      }
     }),
   getFeedPublications: protectedProcedure
     .input(z.object({ id: z.string() }))

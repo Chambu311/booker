@@ -5,6 +5,7 @@ import { Book, BookPublication, Prisma } from "@prisma/client";
 export type BookWithPublications = Prisma.BookGetPayload<{
   include: {
     publications: true;
+    genre: true
   };
 }>;
 interface IBookCard {

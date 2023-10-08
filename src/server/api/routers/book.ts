@@ -18,6 +18,7 @@ export const bookRouter = createTRPCRouter({
         },
         include: {
             publications: true,
+            genre: true,
         }
       });
     }),

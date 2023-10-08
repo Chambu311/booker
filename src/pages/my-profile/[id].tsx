@@ -19,6 +19,7 @@ export default function PublishBook(props: { book: Book }) {
   const { book } = props;
   const router = useRouter();
   const createPublication = api.publication.createPublication.useMutation();
+  const pausePublication = api.publication.pausePublication.useMutation();
   const publicationQuery = api.publication.findByBookId.useQuery({
     id: book.id,
   });
@@ -97,11 +98,58 @@ export default function PublishBook(props: { book: Book }) {
               {publication?.isActive ? (
                 <button
                   type="button"
+                  onClick={() =>
+                    pausePublication.mutate(
+                      {
+                        id: publication.id,
+                        isActive: false,
+                      },
+                      {
+                        onSuccess: async () => {
+                          await publicationQuery.refetch();
+                        },
+                      },
+                    )
+                  }
                   className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white"
                 >
-                  Pausar publicación
+                  {pausePublication.isLoading ? (
+                    <div className="flex justify-center gap-3">
+                      <p>Pausando...</p>
+                      <MdIcon path={mdiLoading} spin size={1} color="white" />
+                    </div>
+                  ) : (
+                    <p>Pausar publicación</p>
+                  )}
                 </button>
-              ) : null}
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    pausePublication.mutate(
+                      {
+                        id: publication?.id ?? '',
+                        isActive: true,
+                      },
+                      {
+                        onSuccess: async () => {
+                          await publicationQuery.refetch();
+                        },
+                      },
+                    )
+                  }
+                  className="my-3 w-[200px] cursor-pointer rounded-small bg-pink p-1 text-white"
+                >
+                  {pausePublication.isLoading ? (
+                    <div className="flex justify-center gap-3">
+                      <p>Publicando...</p>
+                      <MdIcon path={mdiLoading} spin size={1} color="white" />
+                    </div>
+                  ) : (
+                    <p>Reanudar publicación</p>
+                  )}
+                </button>
+              )}
             </div>
           </div>
           {!publication && !publicationQuery.isLoading ? (
