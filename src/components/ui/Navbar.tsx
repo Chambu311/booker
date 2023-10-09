@@ -48,7 +48,7 @@ export default function Navbar(props: INavbar) {
             <MdIcon path={mdiAccount} size={1} color={"white"} />
           )}
         </div>
-        <Link href={`/my-profile`} className="my-auto">
+        <Link href={`/profile/${session.data?.user.email}`} className="my-auto">
           <div className="text-xl">@{session.data?.user.name}</div>
         </Link>
         <div

@@ -5,7 +5,7 @@ import { Book, BookPublication, Prisma } from "@prisma/client";
 export type BookWithPublications = Prisma.BookGetPayload<{
   include: {
     publications: true;
-    genre: true
+    genre: true;
   };
 }>;
 interface IBookCard {
@@ -57,15 +57,29 @@ export function PublicationCard(props: { publication: PublicationData }) {
   const { publication } = props;
   const book = publication.book;
   return (
-    <div className="flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal font-montserrat align-middle shadow-lg">
+    <div className="flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal align-middle font-montserrat shadow-lg">
       <div
         style={{ backgroundImage: `url('${publication.images[0]?.src}')` }}
         className="h-[70%] w-full rounded-t-normal bg-peach bg-contain bg-center bg-no-repeat"
       />
-      <div className="p-3 flex flex-col">
-        <span className="text-black font-bold">{book.title}</span>
-        <span className="text-black font-normal text-sm italic">{book.author}</span>
+      <div className="flex flex-col p-3">
+        <span className="font-bold text-black">{book.title}</span>
+        <span className="text-sm font-normal italic text-black">
+          {book.author}
+        </span>
       </div>
     </div>
   );
 }
+
+export const LightBookCard = (props: { book: BookWithPublications}) => {
+  const { book } = props;
+  return (
+    <div className="relative grid h-[250px] w-full place-content-center rounded-normal bg-light-pink shadow-md">
+      <div className="flex justify-center">
+        <span className="text-black">{book.title}</span>
+      </div>
+      <div className="flex justify-end">{book.author}</div>
+    </div>
+  );
+};

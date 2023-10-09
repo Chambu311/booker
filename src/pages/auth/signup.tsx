@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { LoadingSpinner } from "~/components/loading";
+import { LoadingSpinner } from "~/components/ui/loading";
 import { api } from "~/utils/api";
 
 export default function SignUp() {

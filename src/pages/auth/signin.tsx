@@ -3,7 +3,7 @@ import { signIn, getProviders, useSession } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "~/server/auth";
 import { mdiGithub, mdiGoogle } from "@mdi/js";
-import MdIcon from "~/components/mdIcon";
+import MdIcon from "~/components/ui/mdIcon";
 import { useState } from "react";
 import { useRouter } from "next/router";
 const Signin: NextPage<{ csrfToken: never; providers: never }> = ({

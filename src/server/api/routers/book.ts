@@ -10,9 +10,10 @@ import { PrismaClient } from "@prisma/client";
 
 export const bookRouter = createTRPCRouter({
   getAllByUserId: protectedProcedure
-    .input(z.object({ userId: z.string() }))
+    .input(z.object({ userId: z.string(), isPublished: z.boolean() }))
     .query(async ({ ctx, input }) => {
-      return ctx.prisma.book.findMany({
+     let filteredBooks = []
+      const books = await ctx.prisma.book.findMany({
         where: {
           userId: input.userId,
         },
@@ -21,6 +22,11 @@ export const bookRouter = createTRPCRouter({
             genre: true,
         }
       });
+      if (input.isPublished) {
+        filteredBooks = books.filter((book) => book.publications.length > 0 && book.publications[0]?.isActive)
+        return filteredBooks;
+      }
+      return books;
     }),
   createBook: protectedProcedure
     .input(

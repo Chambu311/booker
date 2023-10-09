@@ -1,9 +1,9 @@
 import { api } from "~/utils/api";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/ui/Navbar";
 import { useSession } from "next-auth/react";
-import { PublicationCard } from "~/components/book-card";
+import { PublicationCard } from "~/components/ui/book-card";
 import { FeedFilter } from "~/components/feed-filter";
-import { LoadingSpinner } from "~/components/loading";
+import { LoadingSpinner } from "~/components/ui/loading";
 import { useRouter } from "next/router";
 
 export default function Home() {

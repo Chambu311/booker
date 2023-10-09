@@ -1,7 +1,7 @@
-import { Book, BookPublication } from "@prisma/client";
+import { Book } from "@prisma/client";
 import { prisma } from "~/server/db";
 import { GetServerSidePropsContext } from "next";
-import Navbar from "~/components/Navbar";
+import Navbar from "~/components/ui/Navbar";
 import AWS, { S3 } from "aws-sdk";
 import { v4 as uuid } from "uuid";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -10,14 +10,16 @@ import { mdiLoading } from "@mdi/js";
 import { api } from "~/utils/api";
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
-import MdIcon from "~/components/mdIcon";
+import MdIcon from "~/components/ui/mdIcon";
 import { useRouter } from "next/router";
-import { LoadingPage } from "~/components/loading";
+import { LoadingPage } from "~/components/ui/loading";
+import { useSession } from "next-auth/react";
 
 export default function PublishBook(props: { book: Book }) {
   const [fileList, setFileList] = useState<FileList | null>();
   const { book } = props;
   const router = useRouter();
+  const session = useSession();
   const createPublication = api.publication.createPublication.useMutation();
   const pausePublication = api.publication.pausePublication.useMutation();
   const publicationQuery = api.publication.findByBookId.useQuery({
@@ -79,7 +81,7 @@ export default function PublishBook(props: { book: Book }) {
         <div className="relative flex flex-col p-10">
           <div
             className="w-20 cursor-pointer rounded-small bg-platinum px-3 text-black"
-            onClick={() => router.push("/my-profile")}
+            onClick={() => router.push(`/profile/${session.data?.user.email}`)}
           >
             Volver
           </div>
@@ -95,7 +97,7 @@ export default function PublishBook(props: { book: Book }) {
               >
                 Estado: {publication?.isActive ? "Publicado" : "No publicado"}
               </div>
-              {publication?.isActive ? (
+              {publication?.isActive && publication ? (
                 <button
                   type="button"
                   onClick={() =>
@@ -122,13 +124,13 @@ export default function PublishBook(props: { book: Book }) {
                     <p>Pausar publicación</p>
                   )}
                 </button>
-              ) : (
+              ) : publication && !publication.isActive ? (
                 <button
                   type="button"
                   onClick={() =>
                     pausePublication.mutate(
                       {
-                        id: publication?.id ?? '',
+                        id: publication?.id ?? "",
                         isActive: true,
                       },
                       {
@@ -149,7 +151,7 @@ export default function PublishBook(props: { book: Book }) {
                     <p>Reanudar publicación</p>
                   )}
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
           {!publication && !publicationQuery.isLoading ? (

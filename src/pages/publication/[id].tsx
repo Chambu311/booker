@@ -1,11 +1,12 @@
 import { GetServerSidePropsContext } from "next";
 import { Carousel } from "react-responsive-carousel";
-import { BookWithPublications, PublicationData } from "~/components/book-card";
+import { BookWithPublications, PublicationData } from "~/components/ui/book-card";
 import { prisma } from "~/server/db";
 import Image from "next/image";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Navbar from "~/components/Navbar";
+import Navbar from "~/components/ui/Navbar";
 import { api } from "~/utils/api";
+import Link from "next/link";
 
 export default function PublicationDetail(props: {
   publication: PublicationData;
@@ -42,7 +43,7 @@ export default function PublicationDetail(props: {
             </Carousel>
           </div>
           <div className="relative flex w-[50%] flex-col gap-y-3 rounded-normal p-10 shadow-lg">
-            <div className="my-3 text-black italic">
+            <div className="my-3 italic text-black">
               <span>@{userQuery?.data?.name ?? userQuery?.data?.email}</span>
             </div>
             <div className="font-montserrat text-[27px] text-black">
@@ -57,9 +58,11 @@ export default function PublicationDetail(props: {
               <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
                 Enviar solicitud de intercambio
               </button>
-              <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
-                Ver mas publicaciones del usuario
-              </button>
+              <Link href={`/profile/${userQuery?.data?.email}`}>
+                <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
+                  Ver mas publicaciones del usuario
+                </button>
+              </Link>
             </div>
           </div>
         </div>
