@@ -16,6 +16,7 @@ const AddBookModal = (props: IAddBookModal) => {
           <input
             type="text"
             name="title"
+            required
             className="w-[70%] rounded-small bg-platinum px-3"
           />
         </div>
@@ -26,6 +27,7 @@ const AddBookModal = (props: IAddBookModal) => {
           <input
             type="text"
             name="author"
+            required
             className="w-[70%] rounded-small bg-platinum px-3"
           />
         </div>
