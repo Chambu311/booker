@@ -6,7 +6,7 @@ export default function SignUp() {
   const createUser = api.user.createUser.useMutation();
   const router = useRouter();
 
-  function handleSubmit(e: any) {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const email = data.get("email") as string;

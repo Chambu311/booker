@@ -13,17 +13,16 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   async function handleSubmit() {
-    try {
       const userFound = await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/home",
+        redirect: false,
       });
-      console.log("reponse", userFound);
-    } catch (error) {
-      console.log("error", error);
-      window.alert("Invalid credentials");
-    }
+      if (userFound?.error) {
+        window.alert('Credenciales inválidas');
+      } else {
+        await router.push('/home')
+      }
   }
   return (
     <main className="flex h-[100vh] overflow-y-hidden bg-white font-montserrat">
@@ -68,7 +67,6 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
               </div>
             </div>
             <div className="h-[1px] w-full bg-platinum" />
-            <div className="flex justify-center">Or</div>
             {providers &&
               Object.values(providers).map((provider: any) => {
                 return provider.name.includes("GitHub") ? (

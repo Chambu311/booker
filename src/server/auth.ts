@@ -12,6 +12,9 @@ import {
 
 import { prisma } from "~/server/db";
 import bcrypt from "bcryptjs";
+import { error } from "console";
+import { Http2ServerResponse } from "http2";
+import { TRPCError } from "@trpc/server";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -80,19 +83,48 @@ export const authOptions: NextAuthOptions = {
         },
       },
       authorize: async (credentials): Promise<any> => {
-        if (!credentials?.password || !credentials.email) return;
-        const { email, password } = credentials;
-        const user = await prisma.user.findUnique({
-          where: {
-            email,
-          },
-        });
-        const userPassword = user?.password;
-        if (userPassword) {
-          const isValidPassword = bcrypt.compareSync(password, userPassword);
-          if (isValidPassword) return user;
+        if (!credentials?.email || !credentials?.password) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Email and password are required.",
+          });
         }
-        return null;
+        const { email, password } = credentials;
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email,
+            },
+          });
+
+          if (!user) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "User not found.",
+            });
+          }
+          const userPassword = user.password;
+          if (!userPassword) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "User password is missing.",
+            });
+          }
+          const isValidPassword = await bcrypt.compare(password, userPassword);
+
+          if (!isValidPassword) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Invalid credentials.",
+            });
+          }
+          return user;
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An error occurred while authorizing.",
+          });
+        }
       },
     }),
   ],

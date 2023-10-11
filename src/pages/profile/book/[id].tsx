@@ -26,13 +26,13 @@ export default function PublishBook(props: { book: Book }) {
     id: book.id,
   });
   const publication = publicationQuery.data;
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileList(e.target.files);
   }
 
   if (publicationQuery.isLoading) return <LoadingPage />;
 
-  async function handleUploadImages(input: any) {
+  const handleUploadImages = async (input: any) => {
     input.preventDefault();
     const keys: string[] = [];
     if (!fileList) {

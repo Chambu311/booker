@@ -7,17 +7,16 @@ import { LoadingSpinner } from "~/components/ui/loading";
 import { useRouter } from "next/router";
 
 export default function Home() {
-  const query = api.user.getAll.useQuery();
   const router = useRouter();
   const session = useSession();
   const publicationsQuery = api.publication.getFeedPublications.useQuery({
     id: session.data?.user.id ?? "",
   });
   const publications = publicationsQuery.data;
-  console.log("query", query.data);
   function onSearchSubmit(input: unknown) {
     return;
   }
+
   return (
     <div className="h-screen w-screen overflow-x-hidden">
       <nav className="pb-20">

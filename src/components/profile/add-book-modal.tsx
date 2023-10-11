@@ -40,7 +40,7 @@ const AddBookModal = (props: IAddBookModal) => {
             className="h-7 w-[70%] rounded-small bg-platinum px-3"
           >
             {props.genreList?.map((genre) => (
-              <option key={genre.id}>{genre.name}</option>
+              <option key={genre.id} value={genre.name}>{genre.name}</option>
             ))}
           </select>
         </div>

@@ -8,7 +8,7 @@ import { mdiSwapHorizontalCircleOutline } from "@mdi/js";
 import { useState } from "react";
 import LibraryView from "~/components/profile/library-view";
 import { GetServerSidePropsContext } from "next";
-import { prisma } from "~/server/db";
+import { prisma } from "~/server/db"; 
 import { User } from "@prisma/client";
 
 const Profile = (props: { user: User }) => {
