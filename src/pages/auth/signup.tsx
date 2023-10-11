@@ -38,12 +38,14 @@ export default function SignUp() {
             required
             type="text"
             name="name"
+            maxLength={20}
+            minLength={5}
             className="h-9 rounded-small bg-platinum"
           />
           <div className="text-[20px]">Email</div>
           <input
             required
-            type="text"
+            type="email"
             name="email"
             className="h-9 rounded-small bg-platinum"
           />
@@ -52,6 +54,8 @@ export default function SignUp() {
             required
             type="password"
             name="password"
+            maxLength={20}
+            minLength={10}
             className="h-9 rounded-small bg-platinum"
           />
           <button

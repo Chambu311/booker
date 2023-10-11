@@ -42,7 +42,7 @@ export default function PublicationDetail(props: {
               ))}
             </Carousel>
           </div>
-          <div className="relative flex w-[50%] flex-col gap-y-3 rounded-normal p-10 shadow-lg">
+          <div className="relative flex w-[50%] flex-col gap-y-3 rounded-normal platinum-border p-10 shadow-lg">
             <div className="my-3 italic text-black">
               <span>@{userQuery?.data?.name ?? userQuery?.data?.email}</span>
             </div>

@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.platinum-border {
+    border: solid 2px #E5E4E2;
+}

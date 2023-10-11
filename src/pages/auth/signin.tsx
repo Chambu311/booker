@@ -10,19 +10,22 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   providers,
 }) => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  async function handleSubmit() {
-      const userFound = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-      if (userFound?.error) {
-        window.alert('Credenciales inválidas');
-      } else {
-        await router.push('/home')
-      }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
+    const login = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (login?.error) {
+      window.alert("Credenciales inválidas");
+      e.target.reset();
+    } else {
+      await router.push("/home");
+    }
   }
   return (
     <main className="flex h-[100vh] overflow-y-hidden bg-white font-montserrat">
@@ -39,33 +42,30 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
             Booker
           </div>
           <div className="flex flex-col items-center gap-5">
-            <div className="">
+            <form onSubmit={(e) => handleSubmit(e)}>
               <div className="flex flex-col gap-5">
-                <div className="">Email</div>
+                <label className="">Email</label>
                 <input
-                  type="text"
+                  type="email"
                   required
                   name="email"
-                  onChange={(e: any) => setEmail(e.target.value)}
                   className="h-9 w-[230px] rounded-small bg-platinum text-black"
                 />
-                <div className="">Contraseña</div>
+                <label className="">Contraseña</label>
                 <input
                   type="password"
                   name="password"
                   required
-                  onChange={(e: any) => setPassword(e.target.value)}
                   className="h-9 rounded-small bg-platinum text-black"
                 />
                 <button
-                  type="button"
-                  onClick={handleSubmit}
+                  type="submit"
                   className="login-btn mt-5 rounded-small bg-pink p-3 text-[18px] font-bold text-white"
                 >
                   Ingresar
                 </button>
               </div>
-            </div>
+            </form>
             <div className="h-[1px] w-full bg-platinum" />
             {providers &&
               Object.values(providers).map((provider: any) => {

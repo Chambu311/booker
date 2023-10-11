@@ -57,7 +57,7 @@ export function PublicationCard(props: { publication: PublicationData }) {
   const { publication } = props;
   const book = publication.book;
   return (
-    <div className="flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal align-middle font-montserrat shadow-lg">
+    <div className="flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal platinum-border align-middle font-montserrat shadow-lg">
       <div
         style={{ backgroundImage: `url('${publication.images[0]?.src}')` }}
         className="h-[70%] w-full rounded-t-normal bg-peach bg-contain bg-center bg-no-repeat"

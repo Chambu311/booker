@@ -13,7 +13,7 @@ export default function Home() {
     id: session.data?.user.id ?? "",
   });
   const publications = publicationsQuery.data;
-  function onSearchSubmit(input: unknown) {
+  const onSearchSubmit = (input: unknown) => {
     return;
   }
 

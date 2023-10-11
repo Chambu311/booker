@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/require-await */
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GithubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
 import CredentialsProviders from "next-auth/providers/credentials";
 import { type GetServerSidePropsContext } from "next";
 import {
@@ -12,8 +11,6 @@ import {
 
 import { prisma } from "~/server/db";
 import bcrypt from "bcryptjs";
-import { error } from "console";
-import { Http2ServerResponse } from "http2";
 import { TRPCError } from "@trpc/server";
 
 /**
