@@ -44,16 +44,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    password      String?   
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    role          Role      @default(USER)
-    books         Book[]
+    id               String         @id @default(cuid())
+    name             String         @unique
+    password         String?
+    email            String?        @unique
+    emailVerified    DateTime?
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    role             Role           @default(USER)
+    books            Book[]
+    swapsAsRequester SwapRequest[]  @relation("RequesterUser")
+    swapsAsHolder    SwapRequest[]  @relation("HolderUser")
 }
 
 model VerificationToken {
@@ -65,16 +67,18 @@ model VerificationToken {
 }
 
 model Book {
-    id           String            @id @default(cuid())
-    title        String
-    author       String
-    genre        Genre             @relation(fields: [genreId], references: [id])
-    genreId      String
-    type         BookType          @relation(fields: [typeId], references: [id])
-    typeId       String
-    publications BookPublication[] 
-    user         User              @relation(fields: [userId], references: [id])
-    userId       String
+    id                      String            @id @default(cuid())
+    title                   String
+    author                  String
+    genre                   Genre             @relation(fields: [genreId], references: [id])
+    genreId                 String
+    type                    BookType          @relation(fields: [typeId], references: [id])
+    typeId                  String
+    publications            BookPublication[]
+    user                    User              @relation(fields: [userId], references: [id])
+    userId                  String
+    swapRequestsAsHolder    SwapRequest[]     @relation("RequesterBook")
+    swapRequestsAsRequester SwapRequest[]     @relation("HolderBook")
 
     @@index([genreId])
     @@index([typeId])
@@ -86,6 +90,7 @@ model PublicationImage {
     src           String
     publication   BookPublication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
     publicationId String
+
     @@index([publicationId])
 }
 
@@ -102,6 +107,36 @@ model BookPublication {
     @@index([bookId])
 }
 
+model SwapRequest {
+    id              String     @id @default(cuid())
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
+    status          SwapStatus @default(PENDING_HOLDER)
+    requester       User       @relation("RequesterUser", fields: [requesterId], references: [id])
+    requesterId     String
+    holder          User       @relation("HolderUser", fields: [holderId], references: [id])
+    holderId        String
+    holderBook      Book       @relation("HolderBook", fields: [holderBookId], references: [id])
+    holderBookId    String
+    requesterBook   Book?      @relation("RequesterBook", fields: [requesterBookId], references: [id])
+    requesterBookId String?
+
+    @@index([requesterId])
+    @@index([holderId])
+    @@index([requesterBookId])
+    @@index([holderBookId])
+}
+
+// model SwapNotification {
+//     id        String   @id @default(cuid())
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+//     user      User     @relation(fields: [userId], references: [id])
+//     userId    String
+
+//     @@index([userId])
+// }
+
 model Genre {
     id    String @id @default(cuid())
     name  String
@@ -117,4 +152,11 @@ model BookType {
 enum Role {
     USER
     ADMIN
+}
+
+enum SwapStatus {
+    PENDING_HOLDER
+    ACCEPTED
+    CANCELLED
+    REJECTED
 }

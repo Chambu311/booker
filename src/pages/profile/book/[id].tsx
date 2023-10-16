@@ -4,16 +4,15 @@ import { GetServerSidePropsContext } from "next";
 import Navbar from "~/components/ui/Navbar";
 import AWS, { S3 } from "aws-sdk";
 import { v4 as uuid } from "uuid";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChangeEvent, useState } from "react";
 import { mdiLoading } from "@mdi/js";
 import { api } from "~/utils/api";
-import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
 import MdIcon from "~/components/ui/mdIcon";
 import { useRouter } from "next/router";
 import { LoadingPage } from "~/components/ui/loading";
 import { useSession } from "next-auth/react";
+import Carousel from "~/components/ui/carousel";
 
 export default function PublishBook(props: { book: Book }) {
   const [fileList, setFileList] = useState<FileList | null>();
@@ -28,7 +27,7 @@ export default function PublishBook(props: { book: Book }) {
   const publication = publicationQuery.data;
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileList(e.target.files);
-  }
+  };
 
   if (publicationQuery.isLoading) return <LoadingPage />;
 
@@ -71,7 +70,7 @@ export default function PublishBook(props: { book: Book }) {
         },
       },
     );
-  }
+  };
   return (
     <div className="">
       <header className="pb-20">
@@ -81,7 +80,7 @@ export default function PublishBook(props: { book: Book }) {
         <div className="relative flex flex-col p-10">
           <div
             className="w-20 cursor-pointer rounded-small bg-platinum px-3 text-black"
-            onClick={() => router.push(`/profile/${session.data?.user.email}`)}
+            onClick={() => router.push(`/profile/${session.data?.user.name}`)}
           >
             Volver
           </div>
@@ -91,8 +90,10 @@ export default function PublishBook(props: { book: Book }) {
             <h2 className="text-[25px] italic">{book.author}</h2>
             <div className="flex gap-10">
               <div
-                className={`my-3 w-[200px] rounded-small ${
-                  publication?.isActive ? "bg-green" : "bg-platinum"
+                className={`my-3 w-[200px] rounded-small text-center font-bold ${
+                  publication?.isActive
+                    ? "bg-green text-white"
+                    : "bg-platinum text-black"
                 } border-[1px] p-1`}
               >
                 Estado: {publication?.isActive ? "Publicado" : "No publicado"}
@@ -113,7 +114,7 @@ export default function PublishBook(props: { book: Book }) {
                       },
                     )
                   }
-                  className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white"
+                  className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white font-bold"
                 >
                   {pausePublication.isLoading ? (
                     <div className="flex justify-center gap-3">
@@ -193,23 +194,8 @@ export default function PublishBook(props: { book: Book }) {
             </div>
           )}
         </div>
-        <div className="m-10 h-full">
-          <Carousel
-            showThumbs={false}
-            className="grid place-content-center rounded-normal bg-light-pink"
-          >
-            {publication?.images?.map((img, index) => (
-              <Image
-                src={img.src}
-                key={index}
-                alt="slider"
-                className="h-[400px] w-[400px]"
-                width={100}
-                height={100}
-                quality={100}
-              />
-            ))}
-          </Carousel>
+        <div className="m-10 bg-platinum">
+          <Carousel slides={publication?.images ?? []} />
         </div>
       </div>
     </div>

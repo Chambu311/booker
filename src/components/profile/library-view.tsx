@@ -4,6 +4,7 @@ import {
   mdiArrowLeft,
   mdiLoading,
   mdiCheck,
+  mdiTrashCan,
 } from "@mdi/js";
 import MdIcon from "../ui/mdIcon";
 import { api } from "~/utils/api";
@@ -46,6 +47,10 @@ export default function LibraryView(props: {
         },
       },
     );
+  };
+
+  const isBookPublicated = (book: BookWithPublications) => {
+    return book.publications.some((pub) => pub.isActive);
   };
 
   const onClickCloseModal = () => {
@@ -99,20 +104,26 @@ export default function LibraryView(props: {
           {bookList?.map((book: BookWithPublications) => {
             return (
               <div
-                className="relative w-[200px] cursor-pointer"
+                className="relative flex w-[200px] cursor-pointer flex-col gap-y-4"
                 key={book.id}
-                onClick={async () => {
-                  if (props.isMyUser) {
-                    await router.push(`/profile/book/${book.id}`);
-                  } else {
-                    await router.push(
-                      `/publication/${book.publications[0]?.id}`,
-                    );
-                  }
-                }}
               >
                 {props.isMyUser ? (
-                  <BookCard book={book} onClickDelete={onClickDeleteBook} />
+                  <>
+                    <BookCard book={book} onClickDelete={onClickDeleteBook} />
+                    {isBookPublicated(book) ? (
+                      <div className="flex">
+                        <div className="rounded-small bg-green p-1 text-center text-sm font-bold text-white">
+                          Publicado
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex">
+                        <div className="rounded-small bg-platinum p-1 text-center text-sm font-bold text-black">
+                          No publicado
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <LightBookCard book={book} />
                 )}
@@ -133,7 +144,7 @@ export default function LibraryView(props: {
         />
       </div>
       <div style={{ display: isDeleteBookModalOpen ? "block" : "none" }}>
-        <Modal title="Eliminar libro">
+        <Modal title="Eliminar libro" style="">
           <div className="flex justify-end gap-10">
             <button
               onClick={() => setIsDeleteBookModalOpen(false)}

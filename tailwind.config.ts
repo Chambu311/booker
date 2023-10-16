@@ -18,7 +18,7 @@ export default {
         green: "#a0d911",
         cream: "#FBF4EA",
         lavender: "#E6D6F5",
-        blue: "#ECF7FF",
+        blue: "#5272F2",
         peach: "#F8EEEB",
         purple: "#9376E0",
         "dark-purple": "#2A2F4F",
@@ -33,6 +33,7 @@ export default {
       borderRadius: {
         normal: "10px",
         small: "5px",
+        big: "35px",
       },
       transitionProperty: {
         "opacity-button": "ease 0.7s",

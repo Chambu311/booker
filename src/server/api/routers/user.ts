@@ -6,6 +6,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { error } from "console";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
@@ -28,7 +29,21 @@ export const userRouter = createTRPCRouter({
       const doesUserExist = await ctx.prisma.user.findUnique({
         where: { email: input.email },
       });
-      if (doesUserExist) throw error;
+      const doesUserNameExist = await ctx.prisma.user.findUnique({
+        where: { name: input.name },
+      });
+      if (doesUserNameExist) {
+        throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Username already exists',
+          });
+      };
+      if (doesUserExist)  {
+        throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Account with that email already exists',
+          });
+      };
       const newUser = await ctx.prisma.user.create({
         data: {
           email: input.email,

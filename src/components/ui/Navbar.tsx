@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { mdiAccount, mdiLocationExit, mdiMagnify } from "@mdi/js";
+import { mdiAccount, mdiBell, mdiLocationExit, mdiMagnify } from "@mdi/js";
 import MdIcon from "./mdIcon";
 import Image from "next/image";
 interface INavbar {
@@ -8,6 +8,7 @@ interface INavbar {
 }
 export default function Navbar(props: INavbar) {
   const session = useSession();
+  
   return (
     <div className="justify-between fixed top-0 z-50  flex h-[80px] w-full items-center bg-pink font-montserrat text-white">
       <Link href="/home">
@@ -34,7 +35,11 @@ export default function Navbar(props: INavbar) {
           </label>
         </form>
       </div>
-      <div className="flex w-[20%] gap-5 text-white">
+      <div className="flex w-[25%] gap-5 text-white">
+        <div className="my-auto relative">
+            <div className="absolute"></div>
+            <MdIcon path={mdiBell} size={1.5} color="white" />
+        </div>
         <div className="grid place-content-center rounded-[50%] border border-white p-3">
           {session.data?.user.image ? (
             <Image
@@ -48,7 +53,7 @@ export default function Navbar(props: INavbar) {
             <MdIcon path={mdiAccount} size={1} color={"white"} />
           )}
         </div>
-        <Link href={`/profile/${session.data?.user.email}`} className="my-auto">
+        <Link href={`/profile/${session.data?.user.name}`} className="my-auto">
           <div className="text-xl">@{session.data?.user.name}</div>
         </Link>
         <div

@@ -8,14 +8,15 @@ import { mdiSwapHorizontalCircleOutline } from "@mdi/js";
 import { useState } from "react";
 import LibraryView from "~/components/profile/library-view";
 import { GetServerSidePropsContext } from "next";
-import { prisma } from "~/server/db"; 
+import { prisma } from "~/server/db";
 import { User } from "@prisma/client";
+import SwapRequestsView from "~/components/profile/swap-requests-view";
 
 const Profile = (props: { user: User }) => {
   const [tab, setTab] = useState<number>(0);
   const { user } = props;
   const session = useSession();
-  const isMyProfile = session.data?.user.id === props.user.id;
+  const isMyProfile = session.data?.user.id === props.user?.id;
   function switchTab(index: number) {
     setTab(index);
   }
@@ -82,7 +83,14 @@ const Profile = (props: { user: User }) => {
             </div>
           </div>
           <div className="w-[80%] flex-col rounded-normal p-10 shadow-normal">
-            {tab === 0 ? <LibraryView userId={user.id ? user.id : ""} isMyUser={isMyProfile} /> : null}
+            {tab === 0 ? (
+              <LibraryView
+                userId={user.id}
+                isMyUser={isMyProfile}
+              />
+            ) : (
+              <SwapRequestsView user={user} />
+            )}
           </div>
         </div>
         <style jsx>
@@ -108,19 +116,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const username = ctx.params?.username as string;
   const userFound = await prisma.user.findUnique({
     where: {
-      email: username ?? "",
+      name: username,
     },
     include: {
       books: true,
     },
   });
-  const parsedUser = {
-    ...userFound,
-    emailVerified: JSON.parse(JSON.stringify(userFound?.emailVerified)),
-  };
   return {
     props: {
-      user: parsedUser,
+      user: JSON.parse(JSON.stringify(userFound)),
     },
   };
 }

@@ -6,6 +6,7 @@ import { mdiGithub, mdiGoogle } from "@mdi/js";
 import MdIcon from "~/components/ui/mdIcon";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import toast, { Toaster } from "react-hot-toast";
 const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
   providers,
 }) => {
@@ -21,14 +22,17 @@ const Signin: NextPage<{ csrfToken: never; providers: never }> = ({
       redirect: false,
     });
     if (login?.error) {
-      window.alert("Credenciales inválidas");
+      toast.error("Credenciales invalidas", {
+        duration: 4000,
+      })
       e.target.reset();
     } else {
       await router.push("/home");
     }
-  }
+  };
   return (
     <main className="flex h-[100vh] overflow-y-hidden bg-white font-montserrat">
+      <Toaster position="top-center" />
       <div className="relative h-full w-[70%] bg-login bg-cover bg-no-repeat"></div>
       <div className="relative flex h-full w-[30%] justify-center bg-white p-10">
         <div

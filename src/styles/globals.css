@@ -6,3 +6,16 @@
 .platinum-border {
     border: solid 2px #E5E4E2;
 }
+
+.fade {
+    animation: fade-in ease-out 0.7s;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

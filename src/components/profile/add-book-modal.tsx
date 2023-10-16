@@ -7,7 +7,7 @@ interface IAddBookModal {
 }
 const AddBookModal = (props: IAddBookModal) => {
   return (
-    <Modal title="Añadir libro">
+    <Modal title="Añadir libro" style="w-[500px] h-[400px]">
       <form className="flex flex-col gap-2" onSubmit={props.onFormSubmit}>
         <div className="flex flex-col gap-2">
           <label htmlFor="title" className="text-[15px]">
