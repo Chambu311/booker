@@ -3,9 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "~/utils/api";
+import { useSession } from "next-auth/react";
 
 const SwapRequestsView = (props: { user: User }) => {
-  const [filter, setFilter] = useState<"SENT" | "RECEIVED" | "ALL">("ALL");
+  const session = useSession();
+  const [filter, setFilter] = useState<"SENT" | "RECEIVED">("RECEIVED");
   const router = useRouter();
   const swapRequestsQuery = api.swap.findByUserId.useQuery({
     id: props.user.id,
@@ -13,39 +15,39 @@ const SwapRequestsView = (props: { user: User }) => {
   });
   const swaps = swapRequestsQuery.data;
 
+  const wasSwapSentToMe = (holderId: string) => {
+    return session.data?.user.id === holderId;
+  };
+
   return (
     <div className="flex h-full w-full flex-col gap-y-4">
       <h1 className="text-[30px]">Solicitudes</h1>
       <div className="relative mb-5 flex justify-end gap-10 border-b-[1px] border-platinum py-2 [&>b]:cursor-pointer">
         <b
           onClick={() => setFilter("RECEIVED")}
-          className={filter.includes("RECEIVED") ? "font-bold text-blue" : ""}
+          className={
+            filter.includes("RECEIVED") ? "font-bold text-carisma-500" : ""
+          }
         >
           Recibidas
         </b>
         <b
           onClick={() => setFilter("SENT")}
-          className={filter.includes("SENT") ? "font-bold text-blue" : ""}
+          className={
+            filter.includes("SENT") ? "font-bold text-carisma-500" : ""
+          }
         >
           Enviadas
-        </b>
-        <b
-          onClick={() => setFilter("ALL")}
-          className={filter.includes("ALL") ? "font-bold text-blue" : ""}
-        >
-          Todas
         </b>
       </div>
       <div className="flex flex-col gap-y-5 px-3">
         {swaps?.map((swap, index) => (
-          <div
-            key={index}
-            className="w-full cursor-pointer"
-            onClick={() =>
-              router.push(`/profile/${props.user.name}/${swap.id}`)
-            }
-          >
-            <SwapRequestPreview swap={swap} />
+          <div key={index} className="w-full">
+            {wasSwapSentToMe(swap.holder.id) ? (
+              <ReceivedSwapRequestPreview swap={swap} />
+            ) : (
+              <SentSwapRequestPreview swap={swap} />
+            )}
           </div>
         ))}
       </div>
@@ -64,31 +66,53 @@ export type SwapRequestFullInfo = Prisma.SwapRequestGetPayload<{
   };
 }>;
 
-const SwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
+const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
-  const parseStatus = (status: SwapStatus) => {
-    switch (status) {
-      case "PENDING_HOLDER":
-        return "Esperando selección";
-      case "ACCEPTED":
-        return "Aceptado";
-      case "CANCELLED":
-        return "Cancelado";
-    }
-  };
   return (
-    <div className="grid grid-cols-3 rounded-normal border-[1.5px] border-platinum p-5 shadow-normal">
-      <div className="flex gap-5">
-        <b>Hacia:</b>
-        <p> {swap?.holder.email}</p>
+    <div className="banner flex h-full shadow-normal">
+      <div className="flex w-[50%] flex-col gap-y-5 p-5">
+        <div className="flex gap-4 text-[20px]">
+          <p>De :</p>
+          <Link href={`/profile/${swap.requester.name}`} className="text-blue">
+            @{swap.requester.name}
+          </Link>
+        </div>
+        <div className="flex gap-4">
+          <p>Su seleccion :</p>
+          <b>
+            {swap.holderBook.title} - {swap.holderBook.author}
+          </b>
+        </div>
       </div>
-      <div className="flex gap-5">
-        <b>Libro seleccionado</b>
-        <p>{swap?.holderBook.title}</p>
+      <div className="relative grid h-full w-[50%] place-content-center border-[1px] border-l-carisma-500 p-5">
+        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+          <button className="primary-btn">Seleccionar libro</button>
+        </Link>
       </div>
-      <div className="flex gap-5">
-        <b>Estado:</b>
-        <p>{parseStatus(swap.status)}</p>
+    </div>
+  );
+};
+
+const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
+  const { swap } = props;
+  return (
+    <div className="banner flex h-full shadow-normal">
+      <div className="flex w-[50%] flex-col gap-y-5 p-5">
+        <div className="flex gap-4 text-[20px]">
+          <p>Hacia :</p>
+          <Link href={`/profile/${swap.holder.name}`} className="text-blue">
+            @{swap.holder.name}
+          </Link>
+        </div>
+        <div className="flex gap-4">
+          <p>Tu seleccion :</p>
+          <b>
+            {swap.holderBook.title} - {swap.holderBook.author}
+          </b>
+        </div>
+      </div>
+      <div className="relative grid h-full w-[50%] place-content-center border-[1px] border-l-carisma-500 p-5">
+        <p className="">Esperando selección...</p>
       </div>
     </div>
   );

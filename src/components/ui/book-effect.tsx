@@ -1,27 +1,50 @@
 import { api } from "~/utils/api";
 import { BookWithPublications } from "./book-card";
 import MdIcon from "./mdIcon";
-import { mdiCheckCircle } from "@mdi/js";
+import { mdiBookmark, mdiCheckCircle } from "@mdi/js";
+import { useState } from "react";
 
-const BookEffect = (props: { bookId: string }) => {
-  const pubQuery = api.publication.findByBookId.useQuery({ id: props.bookId });
-  const images = pubQuery.data?.images;
+const BookEffect = (props: { open: boolean }) => {
   return (
-    <div className="book scale-[0.7]">
-      <div className="back bg-black"></div>
-      <div
-        style={{ backgroundImage: images ? `url('${images[0]?.src}')` : "" }}
-        className="page6 grid place-content-center bg-[#fdfdfd] bg-cover bg-center bg-no-repeat"
-      ></div>
-      <div
-        style={{ backgroundImage: images ? `url('${images[1]?.src}')` : "" }}
-        className="page5 bg-[#fafafa] bg-cover bg-center bg-no-repeat"
-      ></div>
+    <div
+      className={`book relative scale-[2] ${
+        props.open ? "clicked" : ""
+      } bg-transparent`}
+    >
+      <div className="back bg-carisma-500"></div>
+      <div className="page6 border-l-[1px] border-l-platinum bg-[#fdfdfd] p-5">
+        <p className="text-[10px] font-normal italic text-black">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </div>
+      <div className="page5 bg-[#fafafa] p-5">
+        <p className="mirror text-[10px] font-normal italic text-black">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </div>
       <div className="page4 bg-[#f5f5f5]"></div>
       <div className="page3 bg-[#f5f5f5]"></div>
       <div className="page2 bg-[#efefef]"></div>
       <div className="page1 bg-[#efefef]"></div>
-      <div className="front grid place-content-center bg-black"></div>
+      <div className="front relative grid place-content-center bg-carisma-500">
+        <p className="text-[28px] text-white">Booker.</p>
+        <p className=" text-white">Where stories find you</p>
+        <div className="absolute -top-2 right-2">
+          <MdIcon path={mdiBookmark} color="white" size={2} />
+        </div>
+      </div>
       <style jsx>
         {`
           .book {
@@ -55,55 +78,55 @@ const BookEffect = (props: { bookId: string }) => {
           .front,
           .page1,
           .page3,
-          .page5 {
-            border-bottom-right-radius: 0.5em;
-            border-top-right-radius: 0.5em;
-          }
-
+          .page5,
           .back,
           .page2,
           .page4,
           .page6 {
-            border-bottom-right-radius: 0.5em;
-            border-top-right-radius: 0.5em;
+            border-radius: 10px;
           }
 
-          .book:hover .front {
+          .mirror {
+            transform: translateY(-180deg) perspective(1000px);
+            transform-style: preserve-3d;
+          }
+
+          .book.clicked .front {
             transform: rotateY(-160deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page1 {
+          .book.clicked .page1 {
             transform: rotateY(-150deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page2 {
+          .book.clicked .page2 {
             transform: rotateY(-30deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page3 {
+          .book.clicked .page3 {
             transform: rotateY(-140deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page4 {
+          .book.clicked .page4 {
             transform: rotateY(-40deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page5 {
+          .book.clicked .page5 {
             transform: rotateY(-130deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .page6 {
+          .book.clicked .page6 {
             transform: rotateY(-50deg) scale(1.1);
             box-shadow: 0 1em 3em 0 rgba(0, 0, 0, 0.2);
           }
 
-          .book:hover .back {
+          .book.clicked .back {
             transform: rotateY(-20deg) scale(1.1);
           }
         `}
@@ -113,24 +136,3 @@ const BookEffect = (props: { bookId: string }) => {
 };
 
 export default BookEffect;
-
-export const SimpleBookPreview = (props: { book: BookWithPublications }) => {
-  const { book } = props;
-  return (
-    <>
-      <div className="relative flex h-[300px] w-[200px] rounded-normal">
-        <div className="w-[20%] rounded-l-[25px] bg-pink"></div>
-        <div className="flex w-[80%] flex-col gap-y-5 rounded-r-normal bg-pink bg-opacity-75 px-10 pt-20">
-            <p className="text-center text-[18px]">{book.title}</p>
-            <p className="text-center text-black font-bold italic">{book.author}</p>
-        </div>
-        <div className="absolute bottom-[4px] left-[3px] grid h-10 w-full  grid-cols-1 place-content-center gap-y-[6px] rounded-l-[40px] rounded-r-none bg-white px-1">
-          <div className="h-[1px] w-full bg-black bg-opacity-50"></div>
-          <div className="h-[1px] w-full bg-black bg-opacity-50"></div>
-          <div className="h-[1px] w-full bg-black bg-opacity-50"></div>
-          <div className="h-[1px] w-full bg-black bg-opacity-50"></div>
-        </div>
-      </div>
-    </>
-  );
-};

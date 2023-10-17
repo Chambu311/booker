@@ -85,7 +85,7 @@ export default function PublishBook(props: { book: Book }) {
             Volver
           </div>
 
-          <div className="m-5 w-full rounded-normal p-5 shadow-normal">
+          <div className="m-5 w-full banner rounded-normal p-5 shadow-normal">
             <h1 className="text-[30px]">{book.title}</h1>
             <h2 className="text-[25px] italic">{book.author}</h2>
             <div className="flex gap-10">
@@ -114,7 +114,7 @@ export default function PublishBook(props: { book: Book }) {
                       },
                     )
                   }
-                  className="my-3 w-[200px] cursor-pointer rounded-small bg-red-400 p-1 text-white font-bold"
+                  className="my-3 w-[200px] cursor-pointer primary-btn"
                 >
                   {pausePublication.isLoading ? (
                     <div className="flex justify-center gap-3">
@@ -141,7 +141,7 @@ export default function PublishBook(props: { book: Book }) {
                       },
                     )
                   }
-                  className="my-3 w-[200px] cursor-pointer rounded-small bg-pink p-1 text-white"
+                  className="my-3 w-[200px] cursor-pointer primary-btn"
                 >
                   {pausePublication.isLoading ? (
                     <div className="flex justify-center gap-3">
@@ -167,7 +167,7 @@ export default function PublishBook(props: { book: Book }) {
               />
               <p className="text-[20px] font-bold">Imagenes</p>
               <input
-                className="w-[300px] rounded-small bg-pink text-white"
+                className="w-[300px] rounded-small bg-carisma-500 text-white"
                 type="file"
                 multiple
                 onChange={(e) => handleFileChange(e)}
@@ -175,7 +175,7 @@ export default function PublishBook(props: { book: Book }) {
               />
               <button
                 type="submit"
-                className="mt-5 w-[200px] rounded-small bg-pink p-2 font-bold text-white"
+                className="mt-5 w-[200px] primary-btn"
               >
                 {createPublication.isLoading ? (
                   <div className="flex justify-center gap-3">
@@ -194,7 +194,7 @@ export default function PublishBook(props: { book: Book }) {
             </div>
           )}
         </div>
-        <div className="m-10 bg-platinum">
+        <div className="m-10 bg-carisma-50">
           <Carousel slides={publication?.images ?? []} />
         </div>
       </div>

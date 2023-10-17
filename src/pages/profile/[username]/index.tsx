@@ -20,7 +20,6 @@ const Profile = (props: { user: User }) => {
   function switchTab(index: number) {
     setTab(index);
   }
-
   return (
     <>
       <header className="pb-20">
@@ -73,7 +72,7 @@ const Profile = (props: { user: User }) => {
                     />
                     <span
                       className="cursor-pointer"
-                      onClick={() => switchTab(2)}
+                      onClick={() => switchTab(1)}
                     >
                       Mis intercambios
                     </span>
@@ -84,13 +83,10 @@ const Profile = (props: { user: User }) => {
           </div>
           <div className="w-[80%] flex-col rounded-normal p-10 shadow-normal">
             {tab === 0 ? (
-              <LibraryView
-                userId={user.id}
-                isMyUser={isMyProfile}
-              />
-            ) : (
+              <LibraryView userId={user.id} isMyUser={isMyProfile} />
+            ) : tab === 1 && isMyProfile ? (
               <SwapRequestsView user={user} />
-            )}
+            ) : null}
           </div>
         </div>
         <style jsx>

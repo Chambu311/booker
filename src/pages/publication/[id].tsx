@@ -56,7 +56,7 @@ export default function PublicationDetail(props: {
       <div className="flex flex-col p-10 font-montserrat">
         <Toaster position="top-center" />
         <div className="flex gap-10 h-[500px]">
-          <div className="w-[50%] bg-platinum">
+          <div className="w-[50%] bg-carisma-50">
            <Carousel slides={publication.images} />
           </div>
           <div className="platinum-border relative flex w-[50%] flex-col gap-y-3 rounded-normal p-10 shadow-lg">
@@ -75,7 +75,7 @@ export default function PublicationDetail(props: {
               {!swapQuery.data ? (
                 <button
                   onClick={onClickSendSwapRequest}
-                  className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink"
+                  className="secondary-btn"
                 >
                   {newSwapMutation.isLoading ? (
                     <div className="flex justify-center gap-5">
@@ -87,12 +87,12 @@ export default function PublicationDetail(props: {
                   )}
                 </button>
               ) : (
-                <div className="rounded-normal bg-green p-2 text-[18px] font-bold text-white">
+                <div className="rounded-small bg-green p-2 text-[18px] font-bold text-white">
                   Solicitud enviada
                 </div>
               )}
               <Link href={`/profile/${userQuery?.data?.name}`}>
-                <button className="rounded-normal border-[1px] border-pink p-2 text-[18px] text-pink">
+                <button className="primary-btn">
                   Ver mas publicaciones del usuario
                 </button>
               </Link>

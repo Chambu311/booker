@@ -125,7 +125,9 @@ export default function LibraryView(props: {
                     )}
                   </>
                 ) : (
-                  <LightBookCard book={book} />
+                    <div onClick={() => router.push(`/publication/${book.publications[0]?.id}`)}>
+                        <LightBookCard book={book} />
+                    </div>
                 )}
               </div>
             );

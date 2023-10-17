@@ -76,7 +76,7 @@ export const swapRouter = createTRPCRouter({
     .input(z.object({ swapId: z.string(), requesterBookId: z.string()}))
     .mutation(async ({ ctx, input }) => {
         const bookFound = await ctx.prisma.book.findUnique({ where: { id: input.requesterBookId }});
-        const updatedSwapRequest = await ctx.prisma.swapRequest.update({
+        await ctx.prisma.swapRequest.update({
             where: {
                 id: input.swapId,
             },

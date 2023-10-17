@@ -54,7 +54,7 @@ const AddBookModal = (props: IAddBookModal) => {
           </button>
           <button
             type="submit"
-            className="rounded-small bg-pink p-2 font-bold text-white"
+            className="rounded-small bg-carisma-500 p-2 font-bold text-white"
           >
             Guardar
           </button>

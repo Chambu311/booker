@@ -1,7 +1,6 @@
 import { useState } from "react";
-import Image from "next/image";
 import MdIcon from "./mdIcon";
-import { mdiArrowLeft, mdiArrowLeftThick, mdiArrowRightThick } from "@mdi/js";
+import {mdiArrowLeftThick, mdiArrowRightThick } from "@mdi/js";
 export default function Carousel(props: { slides: any[] }) {
   const [current, setCurrent] = useState(0);
   const { slides } = props;
@@ -20,8 +19,8 @@ export default function Carousel(props: { slides: any[] }) {
       <div
         className="flex h-full w-full transition ease-out"
         style={{
-          width: `${slides.length * 100}%`, // Ensure that the container is wide enough to accommodate all slides
-          transform: `translateX(-${current * (100 / slides.length)}%)`, // Move slides by a percentage of the total width
+          width: `${slides.length * 100}%`,
+          transform: `translateX(-${current * (100 / slides.length)}%)`,
         }}
       >
         {slides.map((s, index) => (
@@ -51,7 +50,7 @@ export default function Carousel(props: { slides: any[] }) {
               }}
               key={"circle" + i}
               className={`h-5 w-5 cursor-pointer rounded-full  ${
-                i == current ? "bg-white" : "bg-gray-500"
+                i == current ? "bg-blue" : "bg-grey"
               }`}
             ></div>
           );

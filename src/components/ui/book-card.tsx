@@ -19,6 +19,7 @@ export type BookWithPublications = Prisma.BookGetPayload<{
   include: {
     publications: true;
     genre: true;
+    user: true;
   };
 }>;
 interface IBookCard {
@@ -35,8 +36,8 @@ export default function BookCard(props: IBookCard) {
       onClick={() => setAreOptionsVisible(!areOptionsVisible)}
     >
       <div className="relative flex h-[230px] w-[170px] rounded-normal">
-        <div className="w-[20%] rounded-l-[25px] bg-pink"></div>
-        <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-pink bg-opacity-75 px-5 pt-5">
+        <div className="w-[20%] rounded-l-[25px] bg-carisma-500"></div>
+        <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-carisma-400 bg-opacity-75 px-5 pt-5">
           <p className="text-center text-[15px]">{book.title}</p>
           <p className="text-center text-[13px] font-bold italic text-black">
             {book.author}
@@ -50,7 +51,7 @@ export default function BookCard(props: IBookCard) {
         </div>
       </div>
       {areOptionsVisible ? (
-        <div className="fade absolute -right-10 top-0 flex flex-col gap-y-5 rounded-small p-3 shadow-lg">
+        <div className="fade absolute -right-10 top-0 flex flex-col gap-y-5 rounded-big p-3 shadow-lg">
           <div onClick={() => props.onClickDelete(book.id)}>
             <MdIcon
               path={mdiTrashCan}
@@ -115,8 +116,8 @@ export const LightBookCard = (props: { book: BookWithPublications }) => {
   const { book } = props;
   return (
     <div className="relative flex h-[230px] w-[170px] rounded-normal">
-      <div className="w-[20%] rounded-l-[25px] bg-pink"></div>
-      <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-pink bg-opacity-75 px-5 pt-5">
+      <div className="w-[20%] rounded-l-[25px] bg-carisma-500"></div>
+      <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-carisma-400 bg-opacity-75 px-5 pt-5">
         <p className="text-center text-[15px]">{book.title}</p>
         <p className="text-center text-[13px] font-bold italic text-black">
           {book.author}

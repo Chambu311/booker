@@ -20,6 +20,7 @@ export const bookRouter = createTRPCRouter({
         include: {
             publications: true,
             genre: true,
+            user: true,
         }
       });
       if (input.isPublished) {

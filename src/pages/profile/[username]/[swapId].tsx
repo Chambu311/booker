@@ -2,12 +2,11 @@ import { type SwapRequestFullInfo } from "~/components/profile/swap-requests-vie
 import { LoadingPage, LoadingSpinner } from "~/components/ui/loading";
 import { prisma } from "~/server/db";
 import { useSession } from "next-auth/react";
-import { type BookWithPublications } from "~/components/ui/book-card";
+import { LightBookCard, type BookWithPublications } from "~/components/ui/book-card";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import ModalForm from "~/components/ui/modal";
 import Carousel from "~/components/ui/carousel";
-import BookEffect, { SimpleBookPreview } from "~/components/ui/book-effect";
 
 const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const { request } = props;
@@ -27,7 +26,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   });
   const booksToChooseFrom = holderBooksQuery.data;
   return (
-    <div className="flex flex-col gap-y-10 p-10">
+    <div className="flex flex-col gap-y-10 p-10 font-montserrat">
       <div className="flex w-[30%] flex-col rounded-normal p-5 shadow-lg">
         <h1 className="text-[20px] font-bold text-black">
           Solicitud de intercambio
@@ -52,10 +51,10 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
             {booksToChooseFrom?.map((book) => (
               <div
                 key={book.id}
-                className="z-40 cursor-pointer"
+                className="cursor-pointer"
                 onClick={() => setSelectedBookPreview(book)}
               >
-                <SimpleBookPreview book={book} />
+                <LightBookCard book={book} />
               </div>
             ))}
           </div>
@@ -113,16 +112,16 @@ const BookPreviewModal = (props: {
         </div>
       ) : (
         <div className="flex flex-col">
-          <div className="h-[250px] w-full bg-black bg-opacity-30">
+          <div className="h-[250px] w-full bg-carisma-50">
             <Carousel slides={images ?? []} />
           </div>
-          <div className="mt-5 flex justify-between">
-            <button className="rounded-small bg-pink p-2 font-bold text-white">
+          <div className="mt-5 flex gap-10">
+            <button className="primary-btn">
               Confirmar intercambio
             </button>
             <button
               onClick={props.onCloseModal}
-              className="font-bold text-red-500"
+              className="font-bold text-red-500 text-[20px]"
             >
               Salir
             </button>
