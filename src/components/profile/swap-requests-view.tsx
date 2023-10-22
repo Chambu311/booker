@@ -78,16 +78,22 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
           </Link>
         </div>
         <div className="flex gap-4">
-          <p>Su seleccion :</p>
+          <p>Su selección :</p>
           <b>
             {swap.holderBook.title} - {swap.holderBook.author}
           </b>
         </div>
+        {swap.requesterBook ? (
+          <div className="flex gap-4">
+            <p>Tu selección :</p>
+            <b>
+              {swap.requesterBook.title} - {swap.requesterBook.author}
+            </b>
+          </div>
+        ) : null}
       </div>
       <div className="relative grid h-full w-[50%] place-content-center border-[1px] border-l-carisma-500 p-5">
-        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-          <button className="primary-btn">Seleccionar libro</button>
-        </Link>
+        <ReceivedSwapRequestStatusAction {...swap} />
       </div>
     </div>
   );
@@ -105,15 +111,115 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
           </Link>
         </div>
         <div className="flex gap-4">
-          <p>Tu seleccion :</p>
+          <p>Tu selección :</p>
           <b>
             {swap.holderBook.title} - {swap.holderBook.author}
           </b>
         </div>
+        {swap.requesterBook ? (
+          <div className="flex gap-4">
+            <p>Su selección :</p>
+            <b>
+              {swap.requesterBook.title} - {swap.requesterBook.author}
+            </b>
+          </div>
+        ) : null}
       </div>
       <div className="relative grid h-full w-[50%] place-content-center border-[1px] border-l-carisma-500 p-5">
-        <p className="">Esperando selección...</p>
+        <SentSwapRequestStatusAction {...swap} />
       </div>
     </div>
   );
+};
+
+const ReceivedSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
+  const status = swap.status;
+  switch (status) {
+    case "PENDING_HOLDER":
+      return (
+        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+          <button className="primary-btn w-full">Seleccionar libro</button>
+        </Link>
+      );
+    case "PENDING_REQUESTER":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Esperando confirmación...</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "REJECTED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Han rechazado tu selección</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "ACCEPTED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Han aceptado tu selección</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "CANCELLED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Cancelado</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+  }
+};
+
+const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
+  const status = swap.status;
+  switch (status) {
+    case "PENDING_HOLDER":
+      return <p>Esperando selección</p>;
+    case "PENDING_REQUESTER":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Esperando confirmación...</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "REJECTED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Has rechazado el intercambio.</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "ACCEPTED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Has aceptado el intercambio.</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+    case "CANCELLED":
+      return (
+        <div className="flex flex-col gap-y-5">
+          <p>Cancelado.</p>
+          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+            <button className="primary-btn w-full">Ver estado</button>
+          </Link>
+        </div>
+      );
+  }
 };

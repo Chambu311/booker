@@ -36,8 +36,15 @@ export default function SignUp() {
       },
     );
   };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === " " || e.keyCode === 32) {
+      e.preventDefault();
+    }
+  };
+
   return (
-    <div className="grid h-screen relative  w-screen place-content-center overflow-hidden bg-register bg-cover bg-no-repeat font-montserrat">
+    <div className="relative grid h-screen  w-screen place-content-center overflow-hidden bg-register bg-cover bg-no-repeat font-montserrat">
       <Toaster position="top-center" />
       <div className="relative flex min-h-[500px] w-[500px] flex-col rounded-normal bg-white align-middle">
         <div className="z-10 mt-10 text-center text-[30px] font-bold text-black">
@@ -49,17 +56,19 @@ export default function SignUp() {
             required
             type="text"
             name="name"
-            maxLength={20}
+            onKeyDown={handleKeyPress}
+            maxLength={30}
             minLength={5}
-            className="h-9 rounded-small bg-platinum px-3"
+            className="h-10 rounded-small bg-platinum px-3"
             placeholder="Martin1998"
           />
           <div className="text-[20px]">Email</div>
           <input
             required
             type="email"
+            onKeyDown={handleKeyPress}
             name="email"
-            className="h-9 rounded-small bg-platinum px-3"
+            className="h-10 rounded-small bg-platinum px-3"
             placeholder="martin1998@gmail.com"
           />
           <div className="text-[20px]">Contraseña</div>
@@ -68,13 +77,14 @@ export default function SignUp() {
             type="password"
             name="password"
             maxLength={20}
+            onKeyDown={handleKeyPress}
             minLength={10}
-            className="h-9 rounded-small bg-platinum px-3"
+            className="h-10 rounded-small bg-platinum px-3"
             placeholder="*********"
           />
           <button
             type="submit"
-            className="mt-10 flex justify-center primary-btn !p-3 text-[20px]"
+            className="primary-btn mt-10 flex justify-center !p-3 text-[20px]"
           >
             {createUser.isLoading ? (
               <div className="flex gap-5">

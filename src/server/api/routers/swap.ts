@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -29,12 +30,49 @@ export const swapRouter = createTRPCRouter({
           requesterId: input.requesterId,
           holderId: input.holderId,
           holderBookId: input.holderBookId,
+          status: {
+            in: ["PENDING_HOLDER", "PENDING_REQUESTER"],
+          },
+        },
+      });
+    }),
+  updateSwapRequest: protectedProcedure
+    .input(
+      z.object({
+        swapId: z.string(),
+        status: z.enum(["ACCEPTED", "REJECTED", "CANCELLED"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.swapRequest.update({
+        where: {
+          id: input.swapId,
+        },
+        data: {
+          status: input.status,
         },
       });
     }),
   createInitialSwapRequest: protectedProcedure
     .input(InitialSwapRequestData)
     .mutation(async ({ ctx, input }) => {
+      const existingRequestFromSameUser =
+        await ctx.prisma.swapRequest.findFirst({
+          where: {
+            requesterId: input.holderId,
+            holderId: input.requesterId,
+            requesterBookId: input.holderBookId,
+            status: {
+              in: ["PENDING_REQUESTER", "ACCEPTED"],
+            },
+          },
+        });
+      if (Boolean(existingRequestFromSameUser)) {
+        throw new TRPCError({
+          message: "You have already selected this book in another request",
+          code: "CONFLICT",
+        });
+      }
       const newSwapRequest = await ctx.prisma.swapRequest.create({
         data: {
           requesterId: input.requesterId,
@@ -72,18 +110,47 @@ export const swapRouter = createTRPCRouter({
         },
       });
     }),
-  confirmSwapRequest: protectedProcedure
-    .input(z.object({ swapId: z.string(), requesterBookId: z.string()}))
+  confirmRequesterSelection: protectedProcedure
+    .input(
+      z.object({
+        swapId: z.string(),
+        bookId: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-        const bookFound = await ctx.prisma.book.findUnique({ where: { id: input.requesterBookId }});
-        await ctx.prisma.swapRequest.update({
-            where: {
+      const isThereAnotherSwapWithRequesterBook =
+        await ctx.prisma.swapRequest.findFirst({
+          where: {
+            OR: [
+              {
+                requesterBookId: input.bookId,
                 id: input.swapId,
-            },
-            data: {
-                requesterBookId: bookFound?.id,
-            }
-        })
+                status: {
+                  notIn: ["CANCELLED", "REJECTED"],
+                },
+              },
+              {
+                requesterBookId: input.bookId,
+                status: "ACCEPTED",
+              },
+            ],
+          },
+        });
+      if (Boolean(isThereAnotherSwapWithRequesterBook)) {
+        throw new TRPCError({
+          message: "Books has already been selected by user in another request",
+          code: "CONFLICT",
+        });
+      }
+      await ctx.prisma.swapRequest.update({
+        where: {
+          id: input.swapId,
+        },
+        data: {
+          requesterBookId: input.bookId,
+          status: "PENDING_REQUESTER",
+        },
+      });
     }),
 });
 

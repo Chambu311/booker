@@ -5,6 +5,7 @@ import { PublicationCard } from "~/components/ui/book-card";
 import { FeedFilter } from "~/components/feed-filter";
 import { LoadingSpinner } from "~/components/ui/loading";
 import { useRouter } from "next/router";
+import { prisma } from "~/server/db";
 
 export default function Home() {
   const router = useRouter();

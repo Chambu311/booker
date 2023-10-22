@@ -12,19 +12,22 @@ export const bookRouter = createTRPCRouter({
   getAllByUserId: protectedProcedure
     .input(z.object({ userId: z.string(), isPublished: z.boolean() }))
     .query(async ({ ctx, input }) => {
-     let filteredBooks = []
+      let filteredBooks = [];
       const books = await ctx.prisma.book.findMany({
         where: {
           userId: input.userId,
         },
         include: {
-            publications: true,
-            genre: true,
-            user: true,
-        }
+          publications: true,
+          genre: true,
+          user: true,
+        },
       });
       if (input.isPublished) {
-        filteredBooks = books.filter((book) => book.publications.length > 0 && book.publications[0]?.isActive)
+        filteredBooks = books.filter(
+          (book) =>
+            book.publications.length > 0 && book.publications[0]?.isActive,
+        );
         return filteredBooks;
       }
       return books;
@@ -35,7 +38,8 @@ export const bookRouter = createTRPCRouter({
         userId: z.string(),
         title: z.string(),
         author: z.string(),
-        genre: z.string()
+        genre: z.string(),
+        description: z.string().optional(),
       }),
     )
     .mutation(async (opts) => {
@@ -46,21 +50,52 @@ export const bookRouter = createTRPCRouter({
           userId: input.userId,
           title: input.title,
           author: input.author,
-          typeId: "clmnpcd2t0000yx5g02jfqy7p",
-          genreId: genreId ? genreId : '',
+          genreId: genreId ? genreId : "",
+          description: input.description,
         },
       });
       return newBook;
     }),
-    deleteBook: protectedProcedure.input(z.object({ id: z.string()})).mutation( async ({ctx, input}) => {
-        return await ctx.prisma.book.delete({ where: { id: input.id}})
+  deleteBook: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.book.delete({ where: { id: input.id } });
     }),
-    findById: protectedProcedure.input(z.object({id: z.string()})).query( async ({ctx, input}) => {
-        return await ctx.prisma.book.findUnique({ where: { id: input.id }})
-    })
+  findById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.book.findUnique({ where: { id: input.id } });
+    }),
+  findByUserIdAndNotRequestedByUserId: protectedProcedure
+    .input(z.object({ userId: z.string(), holderId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const booksAvailable = await ctx.prisma.book.findMany({
+        where: {
+          userId: input.userId,
+        },
+        include: {
+          publications: true,
+          genre: true,
+          user: true,
+          swapRequestsAsRequester: true,
+        },
+      });
+      const filteredBooks = booksAvailable.filter((book) => {
+        if (book.publications.length > 0 && book.publications[0]?.isActive) {
+          const isRequested = book.swapRequestsAsRequester.some(
+            (swap) => swap.status !== "CANCELLED" && swap.status !== "REJECTED" ,
+          );
+          return !isRequested;
+        }
+        return false;
+      });
+      return filteredBooks;
+    }),
 });
 
 async function getGenreId(prisma: PrismaClient, genreName: string) {
-  const genreFound = await prisma.genre.findFirst({ where: { name: genreName } });
+  const genreFound = await prisma.genre.findFirst({
+    where: { name: genreName },
+  });
   return genreFound?.id;
 }

@@ -35,12 +35,12 @@ export default function BookCard(props: IBookCard) {
       className="relative"
       onClick={() => setAreOptionsVisible(!areOptionsVisible)}
     >
-      <div className="relative flex h-[230px] w-[170px] rounded-normal">
+      <div className="relative flex h-[230px] w-[170px] rounded-normal break-words">
         <div className="w-[20%] rounded-l-[25px] bg-carisma-500"></div>
-        <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-carisma-400 bg-opacity-75 px-5 pt-5">
-          <p className="text-center text-[15px]">{book.title}</p>
+        <div className="flex w-[80%] flex-col  gap-y-2 rounded-r-normal bg-carisma-400 bg-opacity-75 px-5 pt-5">
+          <p className="text-center text-[15px]">{book?.title}</p>
           <p className="text-center text-[13px] font-bold italic text-black">
-            {book.author}
+            {book?.author}
           </p>
         </div>
         <div className="absolute bottom-[4px] left-[3px] grid h-10 w-full  grid-cols-1 place-content-center gap-y-[6px] rounded-l-[40px] rounded-r-none bg-white px-1">
@@ -52,7 +52,7 @@ export default function BookCard(props: IBookCard) {
       </div>
       {areOptionsVisible ? (
         <div className="fade absolute -right-10 top-0 flex flex-col gap-y-5 rounded-big p-3 shadow-lg">
-          <div onClick={() => props.onClickDelete(book.id)}>
+          <div onClick={() => props.onClickDelete(book?.id)}>
             <MdIcon
               path={mdiTrashCan}
               color="black"
@@ -100,7 +100,7 @@ export function PublicationCard(props: { publication: PublicationData }) {
     <div className="platinum-border flex h-[300px] w-[300px] flex-col gap-y-2 rounded-normal align-middle font-montserrat shadow-lg">
       <div
         style={{ backgroundImage: `url('${publication.images[0]?.src}')` }}
-        className="h-[70%] w-full rounded-t-normal bg-peach bg-contain bg-center bg-no-repeat"
+        className="h-[70%] w-full rounded-t-normal bg-carisma-50 bg-contain bg-center bg-no-repeat"
       />
       <div className="flex flex-col p-3">
         <span className="font-bold text-black">{book.title}</span>
@@ -118,9 +118,9 @@ export const LightBookCard = (props: { book: BookWithPublications }) => {
     <div className="relative flex h-[230px] w-[170px] rounded-normal">
       <div className="w-[20%] rounded-l-[25px] bg-carisma-500"></div>
       <div className="flex w-[80%] flex-col gap-y-2 rounded-r-normal bg-carisma-400 bg-opacity-75 px-5 pt-5">
-        <p className="text-center text-[15px]">{book.title}</p>
+        <p className="text-center text-[15px]">{book?.title}</p>
         <p className="text-center text-[13px] font-bold italic text-black">
-          {book.author}
+          {book?.author}
         </p>
       </div>
       <div className="absolute bottom-[4px] left-[3px] grid h-10 w-full  grid-cols-1 place-content-center gap-y-[6px] rounded-l-[40px] rounded-r-none bg-white px-1">

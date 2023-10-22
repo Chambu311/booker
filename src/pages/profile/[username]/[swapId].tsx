@@ -2,68 +2,209 @@ import { type SwapRequestFullInfo } from "~/components/profile/swap-requests-vie
 import { LoadingPage, LoadingSpinner } from "~/components/ui/loading";
 import { prisma } from "~/server/db";
 import { useSession } from "next-auth/react";
-import { LightBookCard, type BookWithPublications } from "~/components/ui/book-card";
+import {
+  LightBookCard,
+  type BookWithPublications,
+} from "~/components/ui/book-card";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import ModalForm from "~/components/ui/modal";
 import Carousel from "~/components/ui/carousel";
+import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
+import { SwapStatus } from "@prisma/client";
+import { useRouter } from "next/router";
 
 const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const { request } = props;
+  const router = useRouter();
+  const [requestStatus, setRequestStatus] = useState<SwapStatus>(
+    request.status,
+  );
   const [selectedBookPreview, setSelectedBookPreview] =
     useState<BookWithPublications>();
   const session = useSession();
   if (!request) {
     return <LoadingPage />;
   }
+  const wasRequestSentToMe = session.data?.user.id === request.holderId;
+  const holderBooksQuery =
+    api.book.findByUserIdAndNotRequestedByUserId.useQuery({
+      userId: request.requesterId,
+      holderId: request.holderId,
+    });
+  const booksToChooseFrom = holderBooksQuery.data;
+  const confirmRequesterSelectionMutation =
+    api.swap.confirmRequesterSelection.useMutation();
+  const updateRequestMutation = api.swap.updateSwapRequest.useMutation();
+
   const onClickCloseModal = () => {
     setSelectedBookPreview(undefined);
   };
-  const wasRequestSent = session.data?.user.id === request.holderId;
-  const holderBooksQuery = api.book.getAllByUserId.useQuery({
-    userId: request.requesterId,
-    isPublished: true,
-  });
-  const booksToChooseFrom = holderBooksQuery.data;
+  const onChangeSelectedBookPreview = (book: BookWithPublications) => {
+    setSelectedBookPreview(book);
+  };
+  const onConfirmRequesterBookSelection = (bookId: string) => {
+    toast.loading("Confirmando selección...", {
+      id: "loading",
+    });
+    confirmRequesterSelectionMutation.mutate(
+      {
+        swapId: request.id,
+        bookId,
+      },
+      {
+        onSuccess: (data) => {
+          toast.dismiss("loading");
+          setSelectedBookPreview(undefined);
+          router.reload();
+        },
+        onError: (error) => {
+          toast.dismiss("loading");
+          toast.error("Este libro no esta disponible", {});
+        },
+      },
+    );
+  };
+
+  const onUpdateSwapRequestStatus = (
+    status: "ACCEPTED" | "CANCELLED" | "REJECTED",
+  ) => {
+    toast.loading(
+      `${status === "ACCEPTED" ? "Confirmando..." : "Cancelando..."}`,
+    );
+    updateRequestMutation.mutate(
+      { swapId: request.id, status: status },
+      {
+        onSuccess: () => {
+          toast.dismiss();
+          setRequestStatus(status);
+        },
+      },
+    );
+  };
   return (
     <div className="flex flex-col gap-y-10 p-10 font-montserrat">
-      <div className="flex w-[30%] flex-col rounded-normal p-5 shadow-lg">
-        <h1 className="text-[20px] font-bold text-black">
+      <div className="fixed left-3 top-3 cursor-pointer rounded-small bg-platinum p-2 text-black">
+        <Link href={`/profile/${session.data?.user.name}`}>Volver</Link>
+      </div>
+      <Toaster position="top-center" />
+      <div className="flex flex-col gap-y-5 border-b-2 border-carisma-400 pb-5">
+        <h1 className="text-center text-[25px] font-bold text-black">
           Solicitud de intercambio
         </h1>
-        <span>Iniciada por: {request.requester.name}</span>
-        <span></span>
-      </div>
-      <div className="flex gap-5">
-        <div className="flex h-full w-[30%] flex-col rounded-normal border-[1px] border-black p-5">
-          <span className="text-center text-[25px] text-black">
-            Libro seleccionado por {request.requester.name}
-          </span>
-          <span className="text-center font-bold">
-            {request.holderBook.title} - {request.holderBook.author}
-          </span>
-        </div>
-        <div className="z-10 flex max-h-full w-[70%] flex-col gap-y-5 overflow-y-auto overflow-x-visible rounded-normal border-2 border-black p-5">
-          <p className="text-center text-black">
-            Seleccione el libro por el cual desea intercambiar su libro
+        <div className="flex justify-around text-[20px]">
+          <p>
+            Iniciada por: <b className="text-blue">@{request.requester.name}</b>
           </p>
-          <div className="grid w-full grid-cols-3 place-content-center p-5">
-            {booksToChooseFrom?.map((book) => (
-              <div
-                key={book.id}
-                className="cursor-pointer"
-                onClick={() => setSelectedBookPreview(book)}
-              >
-                <LightBookCard book={book} />
-              </div>
-            ))}
-          </div>
+          <p>
+            Receptor: <b className="text-blue">@{request.holder.name}</b>
+          </p>
         </div>
       </div>
+      {wasRequestSentToMe && requestStatus === "PENDING_HOLDER" ? (
+        <>
+          <div className="flex items-stretch gap-5">
+            <div className="flex w-[30%] flex-col rounded-normal p-5 shadow-lg">
+              <span className="text-center text-[25px] text-black">
+                Libro seleccionado por {request.requester.name}
+              </span>
+              <div className="flex justify-center p-5">
+                <LightBookCard
+                  book={request.holderBook as BookWithPublications}
+                />
+              </div>
+            </div>
+            <div className="z-10 flex max-h-full w-[70%] flex-col gap-y-5 overflow-y-auto overflow-x-visible rounded-normal border-2 p-5 shadow-lg">
+              <p className="font-bold">Libreria de @{request.requester.name}</p>
+              <p className="text-center text-black">
+                Seleccione el libro por el cual desea intercambiar su libro
+              </p>
+              <div className="grid w-full grid-cols-3 place-content-center p-5">
+                {booksToChooseFrom?.map((book) => (
+                  <div
+                    key={book.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedBookPreview(book)}
+                  >
+                    <LightBookCard book={book} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="primary-btn"
+              onClick={() => onUpdateSwapRequestStatus("CANCELLED")}
+            >
+              Rechazar intercambio
+            </button>
+          </div>
+        </>
+      ) : wasRequestSentToMe && requestStatus === "PENDING_REQUESTER" ? (
+        <>
+          <SwapBooksDetail
+            request={request}
+            wasRequestSentToMe={wasRequestSentToMe}
+            onSelectBookPreview={onChangeSelectedBookPreview}
+          />
+          <p className="text-center text-[25px]">Esperando confirmación...</p>
+          <div className="flex justify-center">
+            <button className="secondary-btn">Cancelar intercambio</button>
+          </div>
+          .
+        </>
+      ) : !wasRequestSentToMe && requestStatus === "PENDING_REQUESTER" ? (
+        <>
+          <SwapBooksDetail
+            wasRequestSentToMe={wasRequestSentToMe}
+            request={request}
+            onSelectBookPreview={onChangeSelectedBookPreview}
+          />
+          <div className="flex justify-center gap-10">
+            <button
+              onClick={() => onUpdateSwapRequestStatus("ACCEPTED")}
+              className="primary-btn"
+            >
+              Confirmar intercambio
+            </button>
+            <button
+              onClick={() => onUpdateSwapRequestStatus("REJECTED")}
+              className="secondary-btn"
+            >
+              Rechazar intercambio
+            </button>
+          </div>
+        </>
+      ) : requestStatus === "ACCEPTED" ||
+        requestStatus === "CANCELLED" ||
+        requestStatus === "REJECTED" ? (
+        <>
+          <SwapBooksDetail
+            request={request}
+            wasRequestSentToMe={wasRequestSentToMe}
+            onSelectBookPreview={onChangeSelectedBookPreview}
+          />
+          <div className="flex justify-center rounded-small">
+            <p
+              className={`${
+                requestStatus === "ACCEPTED"
+                  ? "primary-btn !bg-green"
+                  : "secondary-btn"
+              } pointer-events-none text-[30px]`}
+            >
+              {requestStatus}
+            </p>
+          </div>
+        </>
+      ) : null}
       <div style={{ display: selectedBookPreview ? "block" : "none" }}>
         <BookPreviewModal
           bookId={selectedBookPreview?.id ?? ""}
+          hasSelectionEnded={request.status !== "PENDING_HOLDER"}
           onCloseModal={onClickCloseModal}
+          onConfirm={onConfirmRequesterBookSelection}
         />
       </div>
     </div>
@@ -96,6 +237,8 @@ export const getServerSideProps = async (context: any) => {
 const BookPreviewModal = (props: {
   bookId: string;
   onCloseModal: () => void;
+  onConfirm: (id: string) => void;
+  hasSelectionEnded: boolean;
 }) => {
   const publication = api.publication.findByBookId.useQuery({
     id: props.bookId,
@@ -115,13 +258,23 @@ const BookPreviewModal = (props: {
           <div className="h-[250px] w-full bg-carisma-50">
             <Carousel slides={images ?? []} />
           </div>
+          <div className="max-w-[600px] p-5">
+            <p className="max-w-[600px] text-[18px] text-black">
+              {publication.data?.book.description}
+            </p>
+          </div>
           <div className="mt-5 flex gap-10">
-            <button className="primary-btn">
-              Confirmar intercambio
-            </button>
+            {!props.hasSelectionEnded ? (
+              <button
+                onClick={() => props.onConfirm(props.bookId)}
+                className="primary-btn"
+              >
+                Confirmar selección
+              </button>
+            ) : null}
             <button
               onClick={props.onCloseModal}
-              className="font-bold text-red-500 text-[20px]"
+              className="text-[20px] font-bold text-red-500"
             >
               Salir
             </button>
@@ -129,5 +282,59 @@ const BookPreviewModal = (props: {
         </div>
       )}
     </ModalForm>
+  );
+};
+
+const SwapBooksDetail = (props: {
+  request: SwapRequestFullInfo;
+  onSelectBookPreview: (book: BookWithPublications) => void;
+  wasRequestSentToMe: boolean;
+}) => {
+  const { request, onSelectBookPreview, wasRequestSentToMe } = props;
+  return (
+    <div
+      className={`flex w-full ${
+        !wasRequestSentToMe ? "flex-row-reverse" : "flex-row"
+      } justify-between gap-5 px-10`}
+    >
+      <div
+        className="flex w-[50%] cursor-pointer flex-col rounded-normal shadow-lg"
+        onClick={() =>
+          onSelectBookPreview(request.requesterBook as BookWithPublications)
+        }
+      >
+        {wasRequestSentToMe ? (
+          <p className="text-center text-[25px]">Tu selección</p>
+        ) : (
+          <p className="text-center text-[25px]">
+            Selección de {request.holder.name}
+          </p>
+        )}
+        <div className="flex justify-center p-5">
+          {request.requesterBook ? (
+            <LightBookCard
+              book={request.requesterBook as BookWithPublications}
+            />
+          ) : null}
+        </div>
+      </div>
+      <div
+        onClick={() =>
+          onSelectBookPreview(request.holderBook as BookWithPublications)
+        }
+        className="flex w-[50%] cursor-pointer flex-col rounded-normal shadow-lg"
+      >
+        {wasRequestSentToMe ? (
+          <p className="text-center text-[25px]">
+            Selección de {request.requester.name}
+          </p>
+        ) : (
+          <p className="text-center text-[25px]">Tu selección</p>
+        )}
+        <div className="flex justify-center p-5">
+          <LightBookCard book={request.holderBook as BookWithPublications} />
+        </div>
+      </div>
+    </div>
   );
 };

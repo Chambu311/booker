@@ -7,7 +7,7 @@ interface IAddBookModal {
 }
 const AddBookModal = (props: IAddBookModal) => {
   return (
-    <Modal title="Añadir libro" style="w-[500px] h-[400px]">
+    <Modal title="Añadir libro" style="w-[600px] min-h-[450px]">
       <form className="flex flex-col gap-2" onSubmit={props.onFormSubmit}>
         <div className="flex flex-col gap-2">
           <label htmlFor="title" className="text-[15px]">
@@ -16,8 +16,9 @@ const AddBookModal = (props: IAddBookModal) => {
           <input
             type="text"
             name="title"
+            maxLength={40}
             required
-            className="w-[70%] rounded-small bg-platinum px-3"
+            className="h-10 w-full rounded-small bg-platinum px-3"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -28,7 +29,7 @@ const AddBookModal = (props: IAddBookModal) => {
             type="text"
             name="author"
             required
-            className="w-[70%] rounded-small bg-platinum px-3"
+            className="h-10 w-full rounded-small bg-platinum px-3"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -37,14 +38,26 @@ const AddBookModal = (props: IAddBookModal) => {
           </label>
           <select
             name="genre"
-            className="h-7 w-[70%] rounded-small bg-platinum px-3"
+            className="h-10 w-full rounded-small bg-platinum px-3"
           >
             {props.genreList?.map((genre) => (
-              <option key={genre.id} value={genre.name}>{genre.name}</option>
+              <option key={genre.id} value={genre.name}>
+                {genre.name}
+              </option>
             ))}
           </select>
         </div>
-        <div className="mt-10 flex justify-between">
+        <div className="flex flex-col gap-2">
+          <label htmlFor="title" className="text-[15px]">
+            Descripción
+          </label>
+          <textarea
+            name="description"
+            placeholder="Decínos de que se trata"
+            className=" w-full rounded-small bg-platinum p-3"
+          />
+        </div>
+        <div className="mt-10 flex gap-10 justify-end">
           <button
             onClick={() => props.onClickCloseModal()}
             type="button"
@@ -54,7 +67,7 @@ const AddBookModal = (props: IAddBookModal) => {
           </button>
           <button
             type="submit"
-            className="rounded-small bg-carisma-500 p-2 font-bold text-white"
+            className="primary-btn"
           >
             Guardar
           </button>

@@ -14,6 +14,8 @@ import BookCard, { BookWithPublications, LightBookCard } from "../ui/book-card";
 import { Book } from "@prisma/client";
 import { useRouter } from "next/router";
 import AddBookModal from "./add-book-modal";
+import toast, { Toaster } from "react-hot-toast";
+import { LoadingSpinner } from "../ui/loading";
 
 export default function LibraryView(props: {
   userId: string;
@@ -38,12 +40,17 @@ export default function LibraryView(props: {
   };
 
   const onConfirmDeleteBook = () => {
+    setIsDeleteBookModalOpen(false);
+    toast.loading("Eliminando...", {
+      icon: <LoadingSpinner color="border-carisma-500" />,
+      id: "delete-book",
+    });
     deleteBookMutation.mutate(
       { id: bookToDelete },
       {
         async onSuccess() {
-          setIsDeleteBookModalOpen(false);
           await bookQuery.refetch();
+          toast.dismiss("delete-book");
         },
       },
     );
@@ -59,30 +66,36 @@ export default function LibraryView(props: {
 
   const onFormSubmit = (input: any) => {
     input.preventDefault();
+    toast.loading("Guardando...", {
+      icon: <LoadingSpinner color="border-carisma-500" />,
+      id: "create-book",
+    });
     const formData = new FormData(input.target);
     const title = formData.get("title") as string;
     const author = formData.get("author") as string;
     const genre = formData.get("genre") as string;
+    const description = formData.get("description") as string;
+    setIsModalOpen(false);
     bookMutation.mutate(
       {
         title,
         author,
         genre: genre,
         userId: props.userId,
+        description,
       },
       {
         async onSuccess() {
           await bookQuery.refetch();
+          input.target.reset();
+          toast.dismiss("create-book");
         },
       },
     );
-    if (!bookMutation.isLoading) {
-      setIsModalOpen(false);
-      input.target.reset();
-    }
   };
   return (
     <div className="relative w-full">
+      <Toaster />
       <div className="relative border-b-[1px] border-b-black pb-2 align-middle text-black">
         <div className="flex gap-10">
           <span className="text-[35px]">Libreria</span>
@@ -125,9 +138,13 @@ export default function LibraryView(props: {
                     )}
                   </>
                 ) : (
-                    <div onClick={() => router.push(`/publication/${book.publications[0]?.id}`)}>
-                        <LightBookCard book={book} />
-                    </div>
+                  <div
+                    onClick={() =>
+                      router.push(`/publication/${book.publications[0]?.id}`)
+                    }
+                  >
+                    <LightBookCard book={book} />
+                  </div>
                 )}
               </div>
             );
@@ -146,22 +163,28 @@ export default function LibraryView(props: {
         />
       </div>
       <div style={{ display: isDeleteBookModalOpen ? "block" : "none" }}>
-        <Modal title="Eliminar libro" style="">
-          <div className="flex justify-end gap-10">
-            <button
-              onClick={() => setIsDeleteBookModalOpen(false)}
-              type="button"
-              className="bg-transparent text-[20px] text-pink"
-            >
-              Salir
-            </button>
-            <button
-              type="button"
-              onClick={() => onConfirmDeleteBook()}
-              className="rounded-small bg-red-600 p-2 font-bold text-white"
-            >
-              Eliminar
-            </button>
+        <Modal title="Eliminar libro" style="h-[280px] w-[400px] relative">
+          <div className=" flex flex-col gap-y-5">
+            <p className="text-[18px] text-balance">
+              ¿Seguro quieres eliminar este libro? Se eliminaran todas sus
+              publicaciones y se cancelaran sus intercambios.
+            </p>
+            <div className="flex gap-5 justify-end">
+              <button
+                onClick={() => setIsDeleteBookModalOpen(false)}
+                type="button"
+                className="bg-transparent text-[20px] text-carisma-300"
+              >
+                Salir
+              </button>
+              <button
+                type="button"
+                onClick={() => onConfirmDeleteBook()}
+                className="rounded-small bg-red-600 p-2 font-bold text-white"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </Modal>
       </div>

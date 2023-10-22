@@ -43,7 +43,10 @@ export default function PublicationDetail(props: {
       {
         onSuccess: async () => {
           await swapQuery.refetch();
-          toast.success("Solicitud enviada con éxito.")
+          toast.success("Solicitud enviada con éxito.");
+        },
+        onError: () => {
+          toast.error("Ya has seleccionado este libro en otra solicitud");
         },
       },
     );
@@ -55,21 +58,31 @@ export default function PublicationDetail(props: {
       </nav>
       <div className="flex flex-col p-10 font-montserrat">
         <Toaster position="top-center" />
-        <div className="flex gap-10 h-[500px]">
+        <div className="flex h-[500px] gap-10">
           <div className="w-[50%] bg-carisma-50">
-           <Carousel slides={publication.images} />
+            <Carousel slides={publication.images} />
           </div>
-          <div className="platinum-border relative flex w-[50%] flex-col gap-y-3 rounded-normal p-10 shadow-lg">
-            <div className="my-3 italic text-black">
-              <span>@{userQuery?.data?.name ?? userQuery?.data?.email}</span>
+          <div className="platinum-border relative flex w-[50%] flex-col gap-y-3 rounded-normal px-10 py-2 shadow-lg">
+            <div className="my-3 flex justify-end italic text-black">
+              <span className="text-[20px] text-blue">
+                @{userQuery?.data?.name ?? userQuery?.data?.email}
+              </span>
             </div>
-            <div className="font-montserrat text-[27px] text-black">
+            <div className="font-montserrat text-[20px] text-black">
               <b>Titulo: </b>
               {book?.title}
             </div>
-            <div className=" text-[27px] text-black">
+            <div className="text-[20px] text-black">
               <b>Autor: </b>
               {book?.author}
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-[20px] font-bold text-black">Descripción :</p>
+              <p className="text-[18px]">{book.description}</p>
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-[20px] font-bold text-black">Comentarios :</p>
+              <p className="text-[18px]">{publication.comment}</p>
             </div>
             <div className="absolute bottom-5 flex gap-x-5">
               {!swapQuery.data ? (

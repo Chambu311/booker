@@ -73,3 +73,7 @@
 .secondary-btn:hover {
     background-color: #fef1f6;
 }
+
+.text-balance {
+    text-wrap: balance;
+}

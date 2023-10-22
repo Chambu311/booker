@@ -10,7 +10,7 @@ export default function Navbar(props: INavbar) {
   const session = useSession();
   
   return (
-    <div className="justify-between fixed top-0 z-50  flex h-[80px] w-full items-center bg-carisma-400 font-montserrat text-white">
+    <div className="justify-between fixed top-0 z-50  flex h-[80px] w-full items-center bg-carisma-400 font-montserrat text-white px-5">
       <Link href="/home">
         <div className="absolute left-5 top-0 cursor-pointer font-hayward text-[40px]">
           Booker

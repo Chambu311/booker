@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Custom404 = () => {
   return (
-    <div className="grid h-screen w-screen place-content-center bg-pink">
+    <div className="grid h-screen w-screen place-content-center bg-carisma-500">
       <div className="text-[50px] font-black text-white">
         PÁGINA NO ENCONTRADA
       </div>

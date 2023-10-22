@@ -27,10 +27,10 @@ export const userRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const doesUserExist = await ctx.prisma.user.findUnique({
-        where: { email: input.email },
+        where: { email: input.email.trim() },
       });
       const doesUserNameExist = await ctx.prisma.user.findUnique({
-        where: { name: input.name },
+        where: { name: input.name.trim() },
       });
       if (doesUserNameExist) {
         throw new TRPCError({
@@ -46,9 +46,9 @@ export const userRouter = createTRPCRouter({
       };
       const newUser = await ctx.prisma.user.create({
         data: {
-          email: input.email,
+          email: input.email.trim(),
           password: await bycrypt.hash(input.password, 10),
-          name: input.name,
+          name: input.name.trim(),
           role: "USER",
           emailVerified: new Date(),
         },
