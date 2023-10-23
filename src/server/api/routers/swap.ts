@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Book, PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -44,7 +44,7 @@ export const swapRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.swapRequest.update({
+      const updatedRequest = await ctx.prisma.swapRequest.update({
         where: {
           id: input.swapId,
         },
@@ -52,6 +52,13 @@ export const swapRouter = createTRPCRouter({
           status: input.status,
         },
       });
+      if (input.status === "ACCEPTED") {
+        await updateSwapedBooksStatus(
+          ctx.prisma,
+          updatedRequest.requesterBookId ?? "",
+          updatedRequest.holderBookId,
+        );
+      }
     }),
   createInitialSwapRequest: protectedProcedure
     .input(InitialSwapRequestData)
@@ -115,28 +122,23 @@ export const swapRouter = createTRPCRouter({
       z.object({
         swapId: z.string(),
         bookId: z.string(),
+        requesterId: z.string(),
+        holderId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const isThereAnotherSwapWithRequesterBook =
         await ctx.prisma.swapRequest.findFirst({
           where: {
-            OR: [
-              {
-                requesterBookId: input.bookId,
-                id: input.swapId,
-                status: {
-                  notIn: ["CANCELLED", "REJECTED"],
-                },
-              },
-              {
-                requesterBookId: input.bookId,
-                status: "ACCEPTED",
-              },
-            ],
+            requesterBookId: input.bookId,
+            requesterId: input.requesterId,
+            holderId: input.holderId,
+            status: {
+              in: ["ACCEPTED", "PENDING_REQUESTER"],
+            },
           },
         });
-      if (Boolean(isThereAnotherSwapWithRequesterBook)) {
+      if (isThereAnotherSwapWithRequesterBook) {
         throw new TRPCError({
           message: "Books has already been selected by user in another request",
           code: "CONFLICT",
@@ -204,4 +206,33 @@ const getReceivedSwapRequestsByUserId = async (
       requesterBook: true,
     },
   });
+};
+
+const updateSwapedBooksStatus = async (
+  prisma: PrismaClient,
+  requesterBookId: string,
+  holderBookId: string,
+) => {
+  const books = await prisma.book.findMany({
+    where: {
+      OR: [
+        {
+          id: requesterBookId,
+        },
+        {
+          id: holderBookId,
+        },
+      ],
+    },
+  });
+  for (const book of books) {
+    await prisma.bookPublication.updateMany({
+      where: {
+        bookId: book.id,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+  }
 };

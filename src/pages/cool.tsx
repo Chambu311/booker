@@ -7,7 +7,7 @@ const CoolPage = () => {
   return (
     <div className="relative grid h-screen w-screen place-content-center bg-black font-montserrat">
       {/* <FlipCard /> */}
-      <Carousel3d />
+      <Cardstack />
     </div>
   );
 };
@@ -17,7 +17,7 @@ const FlipCard = () => {
   return (
     <div className="h-40 w-40 [persperctive:1000px]">
       <div className="card relative h-full w-full transition-all duration-500  [transform-style:preserve-3d]  hover:[transform:rotateY(180deg)]">
-        <div className="front absolute  inset-0 grid h-full w-full place-content-center rounded-normal bg-black">
+        <div className="front absolute  inset-0 grid h-full w-full place-content-center rounded-normal bg-white">
           <p className="[transform: translateZ(40px)] text-blue">front</p>
         </div>
         <div className="back [transform: rotateY(180deg)] absolute inset-0 grid h-full w-full place-content-center rounded-normal bg-carisma-500 [backface-visibility:hidden]">
@@ -56,7 +56,8 @@ const Carousel3d = () => {
               key={index}
               onMouseEnter={() => setCellHover(index)}
               onMouseLeave={() => setCellHover(undefined)}
-              className={`bg-blue-500 absolute mx-2 grid h-[150px] w-[170px] place-content-center rounded-normal  border-2 border-black bg-white transition-transform duration-300`}
+              className={`bg-blue-500 absolute mx-2 grid h-[150px] w-[170px] place-content-center overflow-hidden rounded-normal 
+             border-2 border-black bg-white transition-transform duration-300`}
               style={{
                 transform: transformStyle,
               }}
@@ -87,6 +88,40 @@ const Carousel3d = () => {
             to {
               transform: rotateY(320deg);
             }
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+const Cardstack = () => {
+  return (
+    <div className="scene [perspective:1000px]">
+      <div className="stack relative h-[250px] w-[250px] stroke-black [transform-style:preserve-3d]">
+        {Array.from({ length: 5 }).map((_, index) => {
+          const transformStyle = `translate(${index * 20}px, -${index * 20}px) translateZ(-${index * 10}px)`;
+          return (
+            <div
+              key={index}
+              style={{ transform: transformStyle }}
+              className="card grid place-content-center border-2 border-carisma-500 bg-white"
+            >
+              {index === 0 ? <p className="text-black">Hola</p> : null}
+            </div>
+          );
+        })}
+      </div>
+      <style jsx>
+        {`
+          .card {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+          }
+
+          .stack {
           }
         `}
       </style>

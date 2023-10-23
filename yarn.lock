@@ -469,6 +469,11 @@
   "resolved" "https://registry.npmjs.org/@types/bcryptjs/-/bcryptjs-2.4.3.tgz"
   "version" "2.4.3"
 
+"@types/canvas-confetti@^1.6.2":
+  "integrity" "sha512-ozy7d+7AmYnPEgzdGwwAIA0/yLHnT9YBUQAOm5Ucu+P2ptxq2P464SZDVzYp71wD10ZPYckyeC665bPxQM78kw=="
+  "resolved" "https://registry.npmjs.org/@types/canvas-confetti/-/canvas-confetti-1.6.2.tgz"
+  "version" "1.6.2"
+
 "@types/eslint-scope@^3.7.3":
   "integrity" "sha512-JNvhIEyxVW6EoMIFIvj93ZOywYFatlpu9deeH6eSx6PE3WHYvHaQtmHmQeNw7aA81bYGBPPQqdtBm6b1SsQMmA=="
   "resolved" "https://registry.npmjs.org/@types/eslint-scope/-/eslint-scope-3.7.5.tgz"

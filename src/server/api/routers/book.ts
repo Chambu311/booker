@@ -66,31 +66,6 @@ export const bookRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.book.findUnique({ where: { id: input.id } });
     }),
-  findByUserIdAndNotRequestedByUserId: protectedProcedure
-    .input(z.object({ userId: z.string(), holderId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const booksAvailable = await ctx.prisma.book.findMany({
-        where: {
-          userId: input.userId,
-        },
-        include: {
-          publications: true,
-          genre: true,
-          user: true,
-          swapRequestsAsRequester: true,
-        },
-      });
-      const filteredBooks = booksAvailable.filter((book) => {
-        if (book.publications.length > 0 && book.publications[0]?.isActive) {
-          const isRequested = book.swapRequestsAsRequester.some(
-            (swap) => swap.status !== "CANCELLED" && swap.status !== "REJECTED" ,
-          );
-          return !isRequested;
-        }
-        return false;
-      });
-      return filteredBooks;
-    }),
 });
 
 async function getGenreId(prisma: PrismaClient, genreName: string) {

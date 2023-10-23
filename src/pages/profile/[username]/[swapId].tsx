@@ -12,6 +12,7 @@ import ModalForm from "~/components/ui/modal";
 import Carousel from "~/components/ui/carousel";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import confetti from "canvas-confetti";
 import { SwapStatus } from "@prisma/client";
 import { useRouter } from "next/router";
 
@@ -28,11 +29,10 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     return <LoadingPage />;
   }
   const wasRequestSentToMe = session.data?.user.id === request.holderId;
-  const holderBooksQuery =
-    api.book.findByUserIdAndNotRequestedByUserId.useQuery({
-      userId: request.requesterId,
-      holderId: request.holderId,
-    });
+  const holderBooksQuery = api.book.getAllByUserId.useQuery({
+    userId: request.requesterId,
+    isPublished: true,
+  });
   const booksToChooseFrom = holderBooksQuery.data;
   const confirmRequesterSelectionMutation =
     api.swap.confirmRequesterSelection.useMutation();
@@ -52,6 +52,8 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
       {
         swapId: request.id,
         bookId,
+        requesterId: request.requesterId,
+        holderId: request.holderId,
       },
       {
         onSuccess: (data) => {
@@ -61,7 +63,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
         },
         onError: (error) => {
           toast.dismiss("loading");
-          toast.error("Este libro no esta disponible", {});
+          toast.error("Ya has seleccionado este libro en otra solicitud", {});
         },
       },
     );
@@ -79,6 +81,12 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
         onSuccess: () => {
           toast.dismiss();
           setRequestStatus(status);
+          if (status === "ACCEPTED") {
+            confetti({
+              particleCount: 100,
+              spread: 160,
+            });
+          }
         },
       },
     );

@@ -20,6 +20,7 @@
     "@trpc/next": "^10.34.0",
     "@trpc/react-query": "^10.34.0",
     "@trpc/server": "^10.34.0",
+    "@types/canvas-confetti": "^1.6.2",
     "@types/jsonwebtoken": "^9.0.3",
     "@types/uuid": "^9.0.4",
     "aws-sdk": "^2.1463.0",

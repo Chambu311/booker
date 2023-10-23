@@ -131,95 +131,72 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
     </div>
   );
 };
-
 const ReceivedSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
   const status = swap.status;
-  switch (status) {
-    case "PENDING_HOLDER":
-      return (
-        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-          <button className="primary-btn w-full">Seleccionar libro</button>
-        </Link>
-      );
-    case "PENDING_REQUESTER":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Esperando confirmación...</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "REJECTED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Han rechazado tu selección</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "ACCEPTED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Han aceptado tu selección</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "CANCELLED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Cancelado</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-  }
-};
+  let message;
+  let buttonText;
 
+  if (status === "PENDING_HOLDER") {
+    message = "Seleccionar libro";
+    buttonText = "Seleccionar libro";
+  } else if (status === "PENDING_REQUESTER") {
+    message = "Esperando confirmación...";
+    buttonText = "Ver estado";
+  } else if (status === "REJECTED") {
+    message = "Han rechazado tu selección";
+    buttonText = "Ver estado";
+  } else if (status === "ACCEPTED") {
+    message = "Han aceptado tu selección";
+    buttonText = "Ver estado";
+  } else if (status === "CANCELLED") {
+    message = "Cancelado";
+    buttonText = "Ver estado";
+  } else {
+    return null; // Handle unknown status or return a default component
+  }
+
+  return (
+    <div className="flex flex-col gap-y-5">
+      <p>{message}</p>
+      <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+        <button className="primary-btn w-full">{buttonText}</button>
+      </Link>
+    </div>
+  );
+};
 const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
   const status = swap.status;
-  switch (status) {
-    case "PENDING_HOLDER":
-      return <p>Esperando selección</p>;
-    case "PENDING_REQUESTER":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Esperando confirmación...</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "REJECTED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Has rechazado el intercambio.</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "ACCEPTED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Has aceptado el intercambio.</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
-    case "CANCELLED":
-      return (
-        <div className="flex flex-col gap-y-5">
-          <p>Cancelado.</p>
-          <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-            <button className="primary-btn w-full">Ver estado</button>
-          </Link>
-        </div>
-      );
+  let message;
+  let buttonText;
+
+  if (status === "PENDING_HOLDER") {
+    message = "Esperando selección";
+  } else if (status === "PENDING_REQUESTER") {
+    message = "Esperando confirmación...";
+    buttonText = "Ver estado";
+  } else if (status === "REJECTED") {
+    message = "Has rechazado el intercambio.";
+    buttonText = "Ver estado";
+  } else if (status === "ACCEPTED") {
+    message = "Has aceptado el intercambio.";
+    buttonText = "Ver estado";
+  } else if (status === "CANCELLED") {
+    message = "Cancelado.";
+    buttonText = "Ver estado";
+  } else {
+    return null; // Handle unknown status or return a default component
+  }
+
+  if (buttonText) {
+    return (
+      <div className="flex flex-col gap-y-5">
+        <p>{message}</p>
+        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+          <button className="primary-btn w-full">{buttonText}</button>
+        </Link>
+      </div>
+    );
+  } else {
+    return <p>{message}</p>;
   }
 };
