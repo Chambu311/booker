@@ -1,4 +1,4 @@
-import { Book } from "@prisma/client";
+import { Book, BookStatus } from "@prisma/client";
 import { prisma } from "~/server/db";
 import { GetServerSidePropsContext } from "next";
 import Navbar from "~/components/ui/Navbar";
@@ -13,66 +13,31 @@ import { useRouter } from "next/router";
 import { LoadingPage } from "~/components/ui/loading";
 import { useSession } from "next-auth/react";
 import Carousel from "~/components/ui/carousel";
+import { BookWithImages } from "~/components/ui/book-card";
+import toast, { Toaster } from "react-hot-toast";
 
-export default function PublishBook(props: { book: Book }) {
-  const [fileList, setFileList] = useState<FileList | null>();
+export default function PublishBook(props: { book: BookWithImages }) {
   const { book } = props;
+  const updateBookStatusMutation = api.book.updateBookStatus.useMutation();
   const router = useRouter();
   const session = useSession();
-  const createPublication = api.publication.createPublication.useMutation();
-  const pausePublication = api.publication.pausePublication.useMutation();
-  const publicationQuery = api.publication.findByBookId.useQuery({
-    id: book.id,
-  });
-  const publication = publicationQuery.data;
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFileList(e.target.files);
-  };
 
-  if (publicationQuery.isLoading) return <LoadingPage />;
-
-  const handleUploadImages = async (input: any) => {
-    input.preventDefault();
-    const keys: string[] = [];
-    if (!fileList) {
-      window.alert("Seleccione al menos una imagen");
-      return;
-    }
-    AWS.config.update({
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    });
-    const s3 = new S3();
-    const formData = new FormData(input.target);
-    const comment = formData.get("comment") as string;
-    for (const file of [...fileList]) {
-      const uploadResult = await s3
-        .upload({
-          Bucket: "booker-tesis",
-          Body: file,
-          Key: `booker-image-${book.title}-${uuid()}`,
-          ContentType: "image/png",
-        })
-        .promise();
-
-      const img = uploadResult.Location;
-      keys.push(img);
-    }
-    createPublication.mutate(
+  const onUpdateBookStatus = (status: BookStatus) => {
+    toast.loading("Actualizando...");
+    updateBookStatusMutation.mutate(
+      { status, bookId: book.id },
       {
-        bookId: book.id,
-        imgs: keys,
-        comment,
-      },
-      {
-        onSuccess: async () => {
-          await publicationQuery.refetch();
+        onSuccess: () => {
+          toast.dismiss();
+          router.reload()
         },
       },
     );
   };
+
   return (
     <div className="">
+      <Toaster />
       <header className="pb-20">
         <Navbar />
       </header>
@@ -85,117 +50,45 @@ export default function PublishBook(props: { book: Book }) {
             Volver
           </div>
 
-          <div className="m-5 w-full banner rounded-normal p-5 shadow-normal">
+          <div className="banner my-5 w-full rounded-normal p-5 shadow-normal">
             <h1 className="text-[30px]">{book.title}</h1>
             <h2 className="text-[25px] italic">{book.author}</h2>
-            <div className="flex gap-10">
+            <div className="flex gap-10 my-10">
               <div
-                className={`my-3 w-[200px] rounded-small text-center font-bold ${
-                  publication?.isActive
+                className={`secondary-btn ${
+                  book.status === "PUBLISHED"
                     ? "bg-green text-white"
                     : "bg-platinum text-black"
-                } border-[1px] p-1`}
+                }`}
               >
-                Estado: {publication?.isActive ? "Publicado" : "No publicado"}
+                Estado: {book.status}
               </div>
-              {publication?.isActive && publication ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    pausePublication.mutate(
-                      {
-                        id: publication.id,
-                        isActive: false,
-                      },
-                      {
-                        onSuccess: async () => {
-                          await publicationQuery.refetch();
-                        },
-                      },
-                    )
-                  }
-                  className="my-3 w-[200px] cursor-pointer primary-btn"
-                >
-                  {pausePublication.isLoading ? (
-                    <div className="flex justify-center gap-3">
-                      <p>Pausando...</p>
-                      <MdIcon path={mdiLoading} spin size={1} color="white" />
-                    </div>
-                  ) : (
-                    <p>Pausar publicación</p>
-                  )}
-                </button>
-              ) : publication && !publication.isActive ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    pausePublication.mutate(
-                      {
-                        id: publication?.id ?? "",
-                        isActive: true,
-                      },
-                      {
-                        onSuccess: async () => {
-                          await publicationQuery.refetch();
-                        },
-                      },
-                    )
-                  }
-                  className="my-3 w-[200px] cursor-pointer primary-btn"
-                >
-                  {pausePublication.isLoading ? (
-                    <div className="flex justify-center gap-3">
-                      <p>Publicando...</p>
-                      <MdIcon path={mdiLoading} spin size={1} color="white" />
-                    </div>
-                  ) : (
-                    <p>Reanudar publicación</p>
-                  )}
-                </button>
-              ) : null}
+              <div className="">
+                {book.status === "PUBLISHED" ? (
+                  <button
+                    onClick={() => onUpdateBookStatus("NOT_PUBLISHED")}
+                    className="primary-btn my-auto"
+                  >
+                    Pausar publicación
+                  </button>
+                ) : book.status === "NOT_PUBLISHED" ? (
+                  <button
+                    onClick={() => onUpdateBookStatus("PUBLISHED")}
+                    className="primary-btn"
+                  >
+                    Publicar
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
-          {!publication && !publicationQuery.isLoading ? (
-            <form
-              className="flex w-[40%] flex-col gap-5 p-5"
-              onSubmit={handleUploadImages}
-            >
-              <textarea
-                name="comment"
-                className="w-[400px] rounded-normal bg-platinum p-5"
-                placeholder="e.g libro en buenas condiciones, algunas anotaciones"
-              />
-              <p className="text-[20px] font-bold">Imagenes</p>
-              <input
-                className="w-[300px] rounded-small bg-carisma-500 text-white"
-                type="file"
-                multiple
-                onChange={(e) => handleFileChange(e)}
-                accept="image/*"
-              />
-              <button
-                type="submit"
-                className="mt-5 w-[200px] primary-btn"
-              >
-                {createPublication.isLoading ? (
-                  <div className="flex justify-center gap-3">
-                    <p>Publicando...</p>
-                    <MdIcon path={mdiLoading} spin size={1} color="white" />
-                  </div>
-                ) : (
-                  <p>Publicar</p>
-                )}
-              </button>
-            </form>
-          ) : (
-            <div className="flex flex-col gap-5 p-5">
-              <span className="text-[30px] font-bold italic">Comentarios</span>
-              <p className="text-[20px]">{publication?.comment}</p>
-            </div>
-          )}
+          <div className="w-full rounded-normal bg-platinun p-10 shadow-lg gap-y-4 flex-col flex min-h-[200px]">
+            <p className="text-black text-[25px] font-bold">Descripción</p>
+            <p>{book.description}</p>
+          </div>
         </div>
-        <div className="m-10 bg-carisma-50">
-          <Carousel slides={publication?.images ?? []} />
+        <div className="m-10 bg-carisma-50 max-h-[500px]">
+          <Carousel slides={book?.images ?? []} />
         </div>
       </div>
     </div>
@@ -206,6 +99,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const bookId = ctx.params?.id as string;
   const bookFound = await prisma.book.findUnique({
     where: { id: bookId ? bookId : "" },
+    include: {
+      images: true,
+    },
   });
   return {
     props: {

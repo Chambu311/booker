@@ -213,26 +213,14 @@ const updateSwapedBooksStatus = async (
   requesterBookId: string,
   holderBookId: string,
 ) => {
-  const books = await prisma.book.findMany({
+  await prisma.book.updateMany({
     where: {
-      OR: [
-        {
-          id: requesterBookId,
-        },
-        {
-          id: holderBookId,
-        },
-      ],
+      id: {
+        in: [requesterBookId, holderBookId],
+      },
+    },
+    data: {
+      status: "SWAPPED",
     },
   });
-  for (const book of books) {
-    await prisma.bookPublication.updateMany({
-      where: {
-        bookId: book.id,
-      },
-      data: {
-        isActive: false,
-      },
-    });
-  }
 };

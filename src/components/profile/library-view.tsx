@@ -1,27 +1,26 @@
-import {
-  mdiAccount,
-  mdiPlus,
-  mdiArrowLeft,
-  mdiLoading,
-  mdiCheck,
-  mdiTrashCan,
-} from "@mdi/js";
+import { mdiPlus } from "@mdi/js";
 import MdIcon from "../ui/mdIcon";
 import { api } from "~/utils/api";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Modal from "../ui/modal";
-import BookCard, { BookWithPublications, LightBookCard } from "../ui/book-card";
+import BookCard, {
+  BookWithImages,
+  BookWithPublications,
+  LightBookCard,
+} from "../ui/book-card";
 import { Book } from "@prisma/client";
 import { useRouter } from "next/router";
 import AddBookModal from "./add-book-modal";
 import toast, { Toaster } from "react-hot-toast";
 import { LoadingSpinner } from "../ui/loading";
+import AWS, { S3 } from "aws-sdk";
 
 export default function LibraryView(props: {
   userId: string;
   isMyUser: boolean;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fileList, setFileList] = useState<FileList | null>();
   const router = useRouter();
   const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<string>("");
@@ -37,6 +36,11 @@ export default function LibraryView(props: {
   const onClickDeleteBook = (id: string) => {
     setBookToDelete(id);
     setIsDeleteBookModalOpen(true);
+  };
+
+  const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('files', e.target.files);
+    setFileList(e.target.files);
   };
 
   const onConfirmDeleteBook = () => {
@@ -56,18 +60,23 @@ export default function LibraryView(props: {
     );
   };
 
-  const isBookPublicated = (book: BookWithPublications) => {
-    return book.publications.some((pub) => pub.isActive);
-  };
-
   const onClickCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  const onFormSubmit = (input: any) => {
+  const onFormSubmit = async (input: any) => {
     input.preventDefault();
+    const keys: string[] = [];
+    if (!fileList) {
+      toast.error("Ingrese al menos una imagen");
+      return;
+    }
+    AWS.config.update({
+      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    });
+    const s3 = new S3();
     toast.loading("Guardando...", {
-      icon: <LoadingSpinner color="border-carisma-500" />,
       id: "create-book",
     });
     const formData = new FormData(input.target);
@@ -75,7 +84,21 @@ export default function LibraryView(props: {
     const author = formData.get("author") as string;
     const genre = formData.get("genre") as string;
     const description = formData.get("description") as string;
+    for (const file of [...fileList]) {
+      const uploadResult = await s3
+        .upload({
+          Bucket: "booker-tesis",
+          Body: file,
+          Key: `booker-image-${title}-${crypto.randomUUID()}`,
+          ContentType: "image/png",
+        })
+        .promise();
+
+      const img = uploadResult.Location;
+      keys.push(img);
+    }
     setIsModalOpen(false);
+    console.log("keys", keys);
     bookMutation.mutate(
       {
         title,
@@ -83,6 +106,7 @@ export default function LibraryView(props: {
         genre: genre,
         userId: props.userId,
         description,
+        imgs: keys,
       },
       {
         async onSuccess() {
@@ -94,27 +118,24 @@ export default function LibraryView(props: {
     );
   };
   return (
-    <div className="relative w-full">
+    <div className="relative max-w-full">
       <Toaster />
-      <div className="relative border-b-[1px] border-b-black pb-2 align-middle text-black">
+      {props.isMyUser ? (
+        <div
+          className="absolute -bottom-5 -right-5 cursor-pointer hover:scale-[1.3]"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <MdIcon path={mdiPlus} color="black" size={1.5} className="my-aut" />
+        </div>
+      ) : null}
+      <div className="border-b-[1px] border-b-black pb-2 align-middle text-black">
         <div className="flex gap-10">
           <span className="text-[35px]">Libreria</span>
         </div>
-        {props.isMyUser ? (
-          <div className="add-col absolute -bottom-10 right-0 flex">
-            <MdIcon path={mdiPlus} color="pink" size={1} className="my-auto" />
-            <span
-              className="my-auto cursor-pointer italic"
-              onClick={() => setIsModalOpen(!isModalOpen)}
-            >
-              Agregar
-            </span>
-          </div>
-        ) : null}
       </div>
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
         <div className="grid h-full w-full grid-cols-3 gap-5 p-5">
-          {bookList?.map((book: BookWithPublications) => {
+          {bookList?.map((book: BookWithImages) => {
             return (
               <div
                 className="relative flex w-[200px] cursor-pointer flex-col gap-y-4"
@@ -123,27 +144,29 @@ export default function LibraryView(props: {
                 {props.isMyUser ? (
                   <>
                     <BookCard book={book} onClickDelete={onClickDeleteBook} />
-                    {isBookPublicated(book) ? (
+                    {book.status === "PUBLISHED" ? (
                       <div className="flex">
                         <div className="rounded-small bg-green p-1 text-center text-sm font-bold text-white">
                           Publicado
                         </div>
                       </div>
-                    ) : (
+                    ) : book.status === "NOT_PUBLISHED" ? (
                       <div className="flex">
                         <div className="rounded-small bg-platinum p-1 text-center text-sm font-bold text-black">
                           No publicado
                         </div>
                       </div>
+                    ) : (
+                      <div className="flex">
+                        <div className="rounded-small bg-carisma-500 p-1 text-center text-sm font-bold text-white">
+                          Intercambiado
+                        </div>
+                      </div>
                     )}
                   </>
                 ) : (
-                  <div
-                    onClick={() =>
-                      router.push(`/publication/${book.publications[0]?.id}`)
-                    }
-                  >
-                    <LightBookCard book={book} />
+                  <div onClick={() => router.push(`/publication/${book.id}`)}>
+                    <LightBookCard bookId={book.id} />
                   </div>
                 )}
               </div>
@@ -160,16 +183,18 @@ export default function LibraryView(props: {
           onClickCloseModal={onClickCloseModal}
           onFormSubmit={onFormSubmit}
           genreList={genreListQuery.data}
+          onFileChange={onFileUploadChange}
+          files={fileList}
         />
       </div>
       <div style={{ display: isDeleteBookModalOpen ? "block" : "none" }}>
         <Modal title="Eliminar libro" style="h-[280px] w-[400px] relative">
           <div className=" flex flex-col gap-y-5">
-            <p className="text-[18px] text-balance">
+            <p className="text-balance text-[18px]">
               ¿Seguro quieres eliminar este libro? Se eliminaran todas sus
               publicaciones y se cancelaran sus intercambios.
             </p>
-            <div className="flex gap-5 justify-end">
+            <div className="flex justify-end gap-5">
               <button
                 onClick={() => setIsDeleteBookModalOpen(false)}
                 type="button"

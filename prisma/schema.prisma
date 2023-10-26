@@ -69,38 +69,27 @@ model VerificationToken {
 model Book {
     id                      String            @id @default(cuid())
     title                   String
-    author                  String            
+    author                  String
+    status                  BookStatus        @default(PUBLISHED)
     description             String?
     genre                   Genre             @relation(fields: [genreId], references: [id])
     genreId                 String
-    publications            BookPublication[]
     user                    User              @relation(fields: [userId], references: [id])
     userId                  String
     swapRequestsAsHolder    SwapRequest[]     @relation("RequesterBook")
     swapRequestsAsRequester SwapRequest[]     @relation("HolderBook")
+    images                  BookImage[]
 
     @@index([genreId])
     @@index([userId])
 }
 
-model PublicationImage {
-    id            String          @id @default(cuid())
-    src           String
-    publication   BookPublication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
-    publicationId String
 
-    @@index([publicationId])
-}
-
-model BookPublication {
-    id        String             @id @default(cuid())
-    createdAt DateTime           @default(now())
-    updatedAt DateTime           @updatedAt
-    isActive  Boolean            @default(false)
-    bookId    String
-    book      Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
-    comment   String
-    images    PublicationImage[]
+model BookImage {
+    id     String @id @default(cuid())
+    src    String
+    book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+    bookId String
 
     @@index([bookId])
 }
@@ -152,4 +141,10 @@ enum SwapStatus {
     ACCEPTED
     CANCELLED
     REJECTED
+}
+
+enum BookStatus {
+    PUBLISHED
+    NOT_PUBLISHED
+    SWAPPED
 }

@@ -2,10 +2,7 @@ import { type SwapRequestFullInfo } from "~/components/profile/swap-requests-vie
 import { LoadingPage, LoadingSpinner } from "~/components/ui/loading";
 import { prisma } from "~/server/db";
 import { useSession } from "next-auth/react";
-import {
-  LightBookCard,
-  type BookWithPublications,
-} from "~/components/ui/book-card";
+import { LightBookCard, type BookWithImages } from "~/components/ui/book-card";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import ModalForm from "~/components/ui/modal";
@@ -23,17 +20,18 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     request.status,
   );
   const [selectedBookPreview, setSelectedBookPreview] =
-    useState<BookWithPublications>();
+    useState<BookWithImages>();
   const session = useSession();
   if (!request) {
     return <LoadingPage />;
   }
   const wasRequestSentToMe = session.data?.user.id === request.holderId;
-  const holderBooksQuery = api.book.getAllByUserId.useQuery({
+  const requesterBooksQuery = api.book.getAllByUserId.useQuery({
     userId: request.requesterId,
     isPublished: true,
   });
-  const booksToChooseFrom = holderBooksQuery.data;
+  const booksToChooseFrom = requesterBooksQuery.data;
+  console.log("books to choose", booksToChooseFrom);
   const confirmRequesterSelectionMutation =
     api.swap.confirmRequesterSelection.useMutation();
   const updateRequestMutation = api.swap.updateSwapRequest.useMutation();
@@ -41,7 +39,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const onClickCloseModal = () => {
     setSelectedBookPreview(undefined);
   };
-  const onChangeSelectedBookPreview = (book: BookWithPublications) => {
+  const onChangeSelectedBookPreview = (book: BookWithImages) => {
     setSelectedBookPreview(book);
   };
   const onConfirmRequesterBookSelection = (bookId: string) => {
@@ -78,11 +76,11 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     updateRequestMutation.mutate(
       { swapId: request.id, status: status },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.dismiss();
           setRequestStatus(status);
           if (status === "ACCEPTED") {
-            confetti({
+            await confetti({
               particleCount: 100,
               spread: 160,
             });
@@ -118,9 +116,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
                 Libro seleccionado por {request.requester.name}
               </span>
               <div className="flex justify-center p-5">
-                <LightBookCard
-                  book={request.holderBook as BookWithPublications}
-                />
+                <LightBookCard bookId={request.holderBook.id} />
               </div>
             </div>
             <div className="z-10 flex max-h-full w-[70%] flex-col gap-y-5 overflow-y-auto overflow-x-visible rounded-normal border-2 p-5 shadow-lg">
@@ -135,7 +131,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
                     className="cursor-pointer"
                     onClick={() => setSelectedBookPreview(book)}
                   >
-                    <LightBookCard book={book} />
+                    <LightBookCard bookId={book.id} />
                   </div>
                 ))}
               </div>
@@ -209,7 +205,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
       ) : null}
       <div style={{ display: selectedBookPreview ? "block" : "none" }}>
         <BookPreviewModal
-          bookId={selectedBookPreview?.id ?? ""}
+          book={selectedBookPreview}
           hasSelectionEnded={request.status !== "PENDING_HOLDER"}
           onCloseModal={onClickCloseModal}
           onConfirm={onConfirmRequesterBookSelection}
@@ -243,38 +239,30 @@ export const getServerSideProps = async (context: any) => {
 };
 
 const BookPreviewModal = (props: {
-  bookId: string;
+  book: BookWithImages | undefined;
   onCloseModal: () => void;
   onConfirm: (id: string) => void;
   hasSelectionEnded: boolean;
 }) => {
-  const publication = api.publication.findByBookId.useQuery({
-    id: props.bookId,
-  });
-  const images = publication.data?.images;
+  const images = props.book?.images;
   return (
     <ModalForm
       style="min-w-[600px] min-h-[400px]"
-      title={publication.data?.book.title ?? "Preview"}
+      title={props.book?.title ?? "Preview"}
     >
-      {publication.isLoading ? (
-        <div className="grid h-full w-full place-content-center">
-          <LoadingSpinner color="border-pink" />
-        </div>
-      ) : (
         <div className="flex flex-col">
           <div className="h-[250px] w-full bg-carisma-50">
             <Carousel slides={images ?? []} />
           </div>
           <div className="max-w-[600px] p-5">
             <p className="max-w-[600px] text-[18px] text-black">
-              {publication.data?.book.description}
+              {props.book?.description}
             </p>
           </div>
           <div className="mt-5 flex gap-10">
             {!props.hasSelectionEnded ? (
               <button
-                onClick={() => props.onConfirm(props.bookId)}
+                onClick={() => props.onConfirm(props.book?.id ?? '')}
                 className="primary-btn"
               >
                 Confirmar selección
@@ -288,14 +276,13 @@ const BookPreviewModal = (props: {
             </button>
           </div>
         </div>
-      )}
     </ModalForm>
   );
 };
 
 const SwapBooksDetail = (props: {
   request: SwapRequestFullInfo;
-  onSelectBookPreview: (book: BookWithPublications) => void;
+  onSelectBookPreview: (book: BookWithImages) => void;
   wasRequestSentToMe: boolean;
 }) => {
   const { request, onSelectBookPreview, wasRequestSentToMe } = props;
@@ -308,7 +295,7 @@ const SwapBooksDetail = (props: {
       <div
         className="flex w-[50%] cursor-pointer flex-col rounded-normal shadow-lg"
         onClick={() =>
-          onSelectBookPreview(request.requesterBook as BookWithPublications)
+          onSelectBookPreview(request.requesterBook as BookWithImages)
         }
       >
         {wasRequestSentToMe ? (
@@ -320,15 +307,13 @@ const SwapBooksDetail = (props: {
         )}
         <div className="flex justify-center p-5">
           {request.requesterBook ? (
-            <LightBookCard
-              book={request.requesterBook as BookWithPublications}
-            />
+            <LightBookCard bookId={request.requesterBook.id} />
           ) : null}
         </div>
       </div>
       <div
         onClick={() =>
-          onSelectBookPreview(request.holderBook as BookWithPublications)
+          onSelectBookPreview(request.holderBook as BookWithImages)
         }
         className="flex w-[50%] cursor-pointer flex-col rounded-normal shadow-lg"
       >
@@ -340,7 +325,7 @@ const SwapBooksDetail = (props: {
           <p className="text-center text-[25px]">Tu selección</p>
         )}
         <div className="flex justify-center p-5">
-          <LightBookCard book={request.holderBook as BookWithPublications} />
+          <LightBookCard bookId={request.holderBook.id} />
         </div>
       </div>
     </div>

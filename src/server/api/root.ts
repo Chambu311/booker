@@ -3,7 +3,6 @@ import { createTRPCRouter } from "~/server/api/trpc";
 import { userRouter } from "./routers/user";
 import { bookRouter } from "./routers/book";
 import { genreRouter } from "./routers/genre";
-import { publicationRouter } from "./routers/bookPublication";
 import { swapRouter } from "./routers/swap";
 
 /**
@@ -15,7 +14,6 @@ export const appRouter = createTRPCRouter({
   example: exampleRouter,
   user: userRouter,
   book: bookRouter,
-  publication: publicationRouter,
   genre: genreRouter,
   swap: swapRouter,
 });

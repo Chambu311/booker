@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import {
+    BookWithImages,
   BookWithPublications,
   PublicationData,
 } from "~/components/ui/book-card";
@@ -14,14 +15,10 @@ import toast, { Toaster } from "react-hot-toast";
 import Carousel from "~/components/ui/carousel";
 
 export default function PublicationDetail(props: {
-  publication: PublicationData;
+  book: BookWithImages;
 }) {
-  const { publication } = props;
+  const { book } = props;
   const session = useSession();
-  const bookQuery = api.book.findById.useQuery({
-    id: publication.book.id,
-  });
-  const book = bookQuery.data as BookWithPublications;
   const userQuery = api.user.findById.useQuery({ id: book?.userId });
   const swapQuery = api.swap.findSwapByUsersIdsAndBookId.useQuery({
     holderId: book?.userId,
@@ -30,9 +27,6 @@ export default function PublicationDetail(props: {
   });
   const newSwapMutation = api.swap.createInitialSwapRequest.useMutation();
 
-  if (bookQuery.isLoading) {
-    return <LoadingPage />;
-  }
   const onClickSendSwapRequest = () => {
     newSwapMutation.mutate(
       {
@@ -60,7 +54,7 @@ export default function PublicationDetail(props: {
         <Toaster position="top-center" />
         <div className="flex h-[500px] gap-10">
           <div className="w-[50%] bg-carisma-50">
-            <Carousel slides={publication.images} />
+            <Carousel slides={book.images} />
           </div>
           <div className="platinum-border relative flex w-[50%] flex-col gap-y-3 rounded-normal px-10 py-2 shadow-lg">
             <div className="my-3 flex justify-end italic text-black">
@@ -79,10 +73,6 @@ export default function PublicationDetail(props: {
             <div className="flex flex-col gap-y-2">
               <p className="text-[20px] font-bold text-black">Descripción :</p>
               <p className="text-[18px]">{book.description}</p>
-            </div>
-            <div className="flex flex-col gap-y-2">
-              <p className="text-[20px] font-bold text-black">Comentarios :</p>
-              <p className="text-[18px]">{publication.comment}</p>
             </div>
             <div className="absolute bottom-5 flex gap-x-5">
               {!swapQuery.data ? (
@@ -118,22 +108,17 @@ export default function PublicationDetail(props: {
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const pubId = ctx.params?.id as string;
-  const pubFound = await prisma.bookPublication.findUnique({
-    where: { id: pubId ?? "" },
+  const bookId = ctx.params?.id as string;
+  const bookFound = await prisma.book.findUnique({
+    where: { id: bookId ?? "" },
     include: {
-      book: true,
+      genre: true,
       images: true,
     },
   });
-  const parsedDatePub = {
-    ...pubFound,
-    createdAt: JSON.parse(JSON.stringify(pubFound?.createdAt)),
-    updatedAt: JSON.parse(JSON.stringify(pubFound?.updatedAt)),
-  };
   return {
     props: {
-      publication: parsedDatePub,
+      book: JSON.parse(JSON.stringify(bookFound)),
     },
   };
 }

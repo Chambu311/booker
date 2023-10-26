@@ -10,10 +10,8 @@ import { prisma } from "~/server/db";
 export default function Home() {
   const router = useRouter();
   const session = useSession();
-  const publicationsQuery = api.publication.getFeedPublications.useQuery({
-    id: session.data?.user.id ?? "",
-  });
-  const publications = publicationsQuery.data;
+  const booksQuery = api.book.getBooksFeed.useQuery({userId: session.data?.user.id ?? ''})
+  const books = booksQuery?.data;
   const onSearchSubmit = (input: unknown) => {
     return;
   }
@@ -28,10 +26,10 @@ export default function Home() {
           <FeedFilter />
         </div>
         <div className="relative grid h-full w-[80%] grid-cols-3 gap-x-20 p-10">
-          {!publicationsQuery.isLoading || !publicationsQuery.isRefetching ? (
-            publications?.map((pub) => (
-              <div key={pub.id} className="text-black cursor-pointer" onClick={() => router.push(`/publication/${pub.id}`)}>
-                <PublicationCard publication={pub} />
+          {!booksQuery.isLoading || !booksQuery.isRefetching ? (
+            books?.map((book, index) => (
+              <div key={index} className="text-black cursor-pointer" onClick={() => router.push(`/publication/${book?.id}`)}>
+                <PublicationCard book={book} />
               </div>
             ))
           ) : (

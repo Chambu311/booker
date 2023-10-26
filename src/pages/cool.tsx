@@ -7,7 +7,7 @@ const CoolPage = () => {
   return (
     <div className="relative grid h-screen w-screen place-content-center bg-black font-montserrat">
       {/* <FlipCard /> */}
-      <Cardstack />
+      <Carousel3d />
     </div>
   );
 };
