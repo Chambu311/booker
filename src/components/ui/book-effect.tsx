@@ -1,8 +1,5 @@
-import { api } from "~/utils/api";
-import { BookWithPublications } from "./book-card";
 import MdIcon from "./mdIcon";
 import { mdiBookmark, mdiCheckCircle } from "@mdi/js";
-import { useState } from "react";
 
 const BookEffect = (props: { open: boolean }) => {
   return (
