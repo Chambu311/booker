@@ -25,8 +25,8 @@ const Profile = (props: { user: User }) => {
       <header className="pb-20">
         <Navbar />
       </header>
-      <div className="h-screen w-full bg-white p-10 font-montserrat">
-        <div className="flex gap-10">
+      <div className="w-full bg-white p-10 font-montserrat">
+        <div className="flex gap-10 justify-center">
           <div className="flex w-[20%] flex-col">
             <div className="w-full flex-col rounded-[10px] px-10 py-10 shadow-normal">
               <div className="flex justify-center">
@@ -124,3 +124,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+

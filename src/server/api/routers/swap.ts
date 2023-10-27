@@ -58,6 +58,7 @@ export const swapRouter = createTRPCRouter({
           updatedRequest.requesterBookId ?? "",
           updatedRequest.holderBookId,
         );
+        await cancelAllSwapRequestsOfSwappedBook(ctx.prisma, input.swapId);
       }
     }),
   createInitialSwapRequest: protectedProcedure
@@ -223,4 +224,40 @@ const updateSwapedBooksStatus = async (
       status: "SWAPPED",
     },
   });
+};
+
+// ** After a book is swapped, we must cancel all other requst where that book has beed selected, as it is no longer available
+const cancelAllSwapRequestsOfSwappedBook = async (
+  prisma: PrismaClient,
+  swapId: string,
+) => {
+  const foundSwap = await prisma.swapRequest.findUnique({
+    where: {
+      id: swapId,
+    },
+  });
+  if (foundSwap) {
+    await prisma.swapRequest.updateMany({
+      where: {
+        id: {
+          not: foundSwap.id,
+        },
+        OR: [
+          {
+            requesterBookId: {
+              in: [foundSwap.requesterBookId ?? "", foundSwap?.holderBookId],
+            },
+          },
+          {
+            holderBookId: {
+              in: [foundSwap?.requesterBookId ?? "", foundSwap.holderBookId],
+            },
+          },
+        ],
+      },
+      data: {
+        status: "BOOK_NOT_AVAILABLE",
+      },
+    });
+  }
 };

@@ -1,7 +1,7 @@
 import { Genre } from "@prisma/client";
 import Modal from "../ui/modal";
 import Carousel from "../ui/carousel";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 interface IAddBookModal {
   onFormSubmit: (e: any) => void;
   onClickCloseModal: () => void;
@@ -10,10 +10,26 @@ interface IAddBookModal {
   onFileChange: (e: any) => void;
 }
 const AddBookModal = (props: IAddBookModal) => {
-  const files = props.files ? [...props.files] : [];
-  const images = files.map((file) => URL.createObjectURL(file));
+  const [slides, setSlides] = useState<
+    {
+      src: string;
+    }[]
+  >([]);
+  const uploadRef = useRef(null) as any;
+  useEffect(() => {
+    if (props.files) {
+      const filesAsArray = [...props.files];
+      const images = filesAsArray.map((file) => {
+        return {
+          src: URL.createObjectURL(file),
+        };
+      });
+      setSlides(images);
+    }
+  }, [props.files]);
+
   return (
-    <Modal title="Añadir libro" style="w-[900px] h-[600px]">
+    <Modal title="Añadir libro" style="w-[900px]">
       <div className="flex h-full w-full gap-5">
         <form
           className="flex w-[50%] flex-col gap-y-5 overflow-y-auto overflow-x-hidden"
@@ -64,12 +80,16 @@ const AddBookModal = (props: IAddBookModal) => {
             <textarea
               name="description"
               placeholder="Decínos de que se trata"
-              className=" w-full rounded-small bg-platinum p-3"
+              maxLength={200}
+              className=" w-full rounded-small bg-platinum p-3 max-h-[200px]"
             />
           </div>
           <div className="mt-10 flex gap-10">
             <button
-              onClick={() => props.onClickCloseModal()}
+              onClick={() => {
+                setSlides([]);
+                props.onClickCloseModal();
+              }}
               type="button"
               className="bg-transparent text-[20px] text-red-600"
             >
@@ -82,17 +102,24 @@ const AddBookModal = (props: IAddBookModal) => {
         </form>
         <div className="relative flex h-full w-[50%] justify-center">
           <div className="m-auto flex h-full w-full flex-col gap-y-10">
-            <div className=" h-[70%]">
-              <Carousel slides={images} />
+            <div className="h-[400px] rounded-normal bg-carisma-50">
+              <Carousel slides={slides} />
             </div>
-            <div className="h-[30%]">
+            <div className="flex h-[30%] justify-end">
               <input
                 type="file"
                 multiple
+                ref={uploadRef}
                 accept="image/*"
-                className=""
+                className="hidden"
                 onChange={(e) => props.onFileChange(e)}
               />
+              <button
+                onClick={() => uploadRef?.current.click()}
+                className="secondary-btn !h-10"
+              >
+                Subir imágenes
+              </button>
             </div>
           </div>
         </div>

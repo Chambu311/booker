@@ -80,7 +80,7 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
         <div className="flex gap-4">
           <p>Su selección :</p>
           <b>
-            {swap.holderBook.title} - {swap.holderBook.author}
+            {swap.holderBook.title}
           </b>
         </div>
         {swap.requesterBook ? (
@@ -102,7 +102,7 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
 const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
   return (
-    <div className="banner flex h-full shadow-normal">
+    <div className="banner flex h-full shadow-normal text-balance">
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>Hacia :</p>
@@ -113,14 +113,14 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
         <div className="flex gap-4">
           <p>Tu selección :</p>
           <b>
-            {swap.holderBook.title} - {swap.holderBook.author}
+            {swap.holderBook.title}
           </b>
         </div>
         {swap.requesterBook ? (
           <div className="flex gap-4">
             <p>Su selección :</p>
             <b>
-              {swap.requesterBook.title} - {swap.requesterBook.author}
+              {swap.requesterBook.title}
             </b>
           </div>
         ) : null}
@@ -184,7 +184,7 @@ const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
     message = "Cancelado.";
     buttonText = "Ver estado";
   } else {
-    return null; // Handle unknown status or return a default component
+    message = 'El libro dejó de estar disponible';
   }
 
   if (buttonText) {

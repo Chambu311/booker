@@ -1,16 +1,13 @@
 @font-face {
-    font-family: "Hayward";
-    src: url('../../public/fonts/Hayward-3zEKp.ttf');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap
-  }
-  
-  
-  @font-face {
-      font-family: 'Montserrat';
-      src: url('../../public/fonts/montserrat/Montserrat-VariableFont_wght.ttf');
-      font-display: swap
-    }
-  
-  
+  font-family: "Hayward";
+  src: url("../../public/fonts/Hayward-3zEKp.ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../public/fonts/montserrat/Montserrat-VariableFont_wght.ttf");
+  font-display: swap;
+}

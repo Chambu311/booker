@@ -13,11 +13,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <>
-    <Head>
+      <Head>
         <link href="https://fonts.cdnfonts.com/css/hayward" rel="stylesheet" />
-    </Head>
+      </Head>
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+          <Component {...pageProps} />
       </SessionProvider>
     </>
   );

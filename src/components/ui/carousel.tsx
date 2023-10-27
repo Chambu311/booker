@@ -26,7 +26,7 @@ export default function Carousel(props: { slides: any[] }) {
         {slides.map((s, index) => (
           <div
             className="h-full w-full bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${s.name}')` }}
+            style={{ backgroundImage: `url('${s.src}')` }}
             key={index}
           />
         ))}

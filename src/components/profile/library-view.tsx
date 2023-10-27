@@ -97,8 +97,6 @@ export default function LibraryView(props: {
       const img = uploadResult.Location;
       keys.push(img);
     }
-    setIsModalOpen(false);
-    console.log("keys", keys);
     bookMutation.mutate(
       {
         title,
@@ -111,6 +109,7 @@ export default function LibraryView(props: {
       {
         async onSuccess() {
           await bookQuery.refetch();
+          setIsModalOpen(false);
           input.target.reset();
           toast.dismiss("create-book");
         },

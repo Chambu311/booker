@@ -141,6 +141,7 @@ enum SwapStatus {
     ACCEPTED
     CANCELLED
     REJECTED
+    BOOK_NOT_AVAILABLE
 }
 
 enum BookStatus {

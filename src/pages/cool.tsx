@@ -15,7 +15,7 @@ export default CoolPage;
 
 const FlipCard = () => {
   return (
-    <div className="h-40 w-40 [persperctive:1000px]">
+    <div className="h-40 w-40 [perspective:1000px]">
       <div className="card relative h-full w-full transition-all duration-500  [transform-style:preserve-3d]  hover:[transform:rotateY(180deg)]">
         <div className="front absolute  inset-0 grid h-full w-full place-content-center rounded-normal bg-white">
           <p className="[transform: translateZ(40px)] text-blue">front</p>
@@ -35,7 +35,7 @@ const Carousel3d = () => {
     return tz;
   };
   const getYRotation = (index: number) => {
-    const rotation = Math.round(360 / 9);
+    const rotation = Math.round(360 / 5);
     return rotation * index;
   };
   return (
@@ -45,11 +45,11 @@ const Carousel3d = () => {
           !cellHover ? "carousel" : "carousel stop"
         }  relative h-full w-full [transform-style:preserve-3d]`}
       >
-        {Array.from({ length: 9 }).map((_, index) => {
-          const zTranslation = getZTranslation(200, 9);
+        {Array.from({ length: 5 }).map((_, index) => {
+          const zTranslation = getZTranslation(200, 5);
           const yRotation = getYRotation(index);
           const transformStyle = `rotateY(${yRotation}deg) translateZ(${zTranslation}px) ${
-            cellHover === index ? "scale(1.3)" : ""
+            cellHover === index ? "scale(1.1)" : ""
           }`;
           return (
             <div
