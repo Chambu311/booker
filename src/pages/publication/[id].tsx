@@ -1,8 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import {
     BookWithImages,
-  BookWithPublications,
-  PublicationData,
 } from "~/components/ui/book-card";
 import { prisma } from "~/server/db";
 import Image from "next/image";

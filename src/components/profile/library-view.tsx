@@ -5,7 +5,6 @@ import { ChangeEvent, useState } from "react";
 import Modal from "../ui/modal";
 import BookCard, {
   BookWithImages,
-  BookWithPublications,
   LightBookCard,
 } from "../ui/book-card";
 import { Book } from "@prisma/client";

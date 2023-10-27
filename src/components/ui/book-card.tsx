@@ -5,13 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 
-export type BookWithPublications = Prisma.BookGetPayload<{
-  include: {
-    publications: true;
-    genre: true;
-    user: true;
-  };
-}>;
 interface IBookCard {
   book: BookWithImages;
   onClickDelete: (id: string) => void;
