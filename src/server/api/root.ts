@@ -4,6 +4,7 @@ import { userRouter } from "./routers/user";
 import { bookRouter } from "./routers/book";
 import { genreRouter } from "./routers/genre";
 import { swapRouter } from "./routers/swap";
+import { notificationRouter } from "./routers/notification";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   book: bookRouter,
   genre: genreRouter,
   swap: swapRouter,
+  notification: notificationRouter,
 });
 
 // export type definition of API

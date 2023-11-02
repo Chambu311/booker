@@ -1,38 +1,80 @@
 import { api } from "~/utils/api";
 import Navbar from "../../components/ui/Navbar";
 import { useSession } from "next-auth/react";
-import { PublicationCard } from "~/components/ui/book-card";
-import { FeedFilter } from "~/components/feed-filter";
+import { BookWithImages, PublicationCard } from "~/components/ui/book-card";
 import { LoadingSpinner } from "~/components/ui/loading";
-import { useRouter } from "next/router";
-import { prisma } from "~/server/db";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import Fuse from "fuse.js";
+
+const options = {
+  includeScore: true,
+  includeMatches: true,
+  findAllMathes: true,
+  threshold: 0.6,
+  keys: ["title", "author", "description", "genre.name"],
+};
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedGenre = searchParams.get("genre");
+  const searchValue = searchParams.get("search");
   const session = useSession();
   const booksQuery = api.book.getBooksFeed.useQuery({
     userId: session.data?.user.id ?? "",
+    genre: selectedGenre,
   });
-  const books = booksQuery?.data;
-  const onSearchSubmit = (input: unknown) => {
-    return;
-  };
+  const genreQuery = api.genre.getAll.useQuery();
+  const genres = genreQuery.data;
+  let books = booksQuery?.data;
+  const fuse = new Fuse(books ?? [], options);
+  if (searchValue) {
+    const searchResults = fuse.search(searchValue);
+    books = searchResults.map((result) => result.item);
+  }
 
   return (
-    <div className="h-screen w-screen overflow-x-hidden">
+    <div className="overflow-hidden">
       <nav className="pb-20">
-        <Navbar onSearchSubmit={onSearchSubmit} />
+        <Navbar />
       </nav>
-      <main className="flex h-full w-full overflow-x-hidden p-10">
-        <div className="w-[30%] p-5">
-          <FeedFilter />
+      <main className="flex h-full w-full flex-col gap-y-10 overflow-x-hidden p-10">
+        <div className="flex gap-5">
+          {genres?.map((genre, index) => (
+            <Link
+              key={index}
+              href={
+                searchValue
+                  ? `?genre=${genre.name}&search=${searchValue}`
+                  : `?genre=${genre.name}`
+              }
+              className={`w-[100px] cursor-pointer rounded-big p-2 text-center text-black hover:bg-carisma-50 ${
+                genre.name === selectedGenre
+                  ? "border-2 border-carisma-400 bg-carisma-50"
+                  : "bg-platinum"
+              }`}
+            >
+              {genre.name}
+            </Link>
+          ))}
+          <button
+            onClick={() => router.push("/home")}
+            className="p-2 hover:text-carisma-500"
+          >
+            Limpiar filtros
+          </button>
         </div>
-        <div className="relative border-platinum border-[1px]  flex h-full w-[70%] flex-col gap-y-5 py-5">
+        <div className="relative flex h-full  w-full flex-col gap-y-5 border-[1px] border-platinum py-5">
           {!booksQuery.isLoading || !booksQuery.isRefetching ? (
             books?.map((book, index) => (
               <div
                 key={index}
-                className="cursor-pointer text-black"
+                className={`cursor-pointer text-black ${
+                  books?.length && index === books?.length - 1
+                    ? ""
+                    : "border-b-[1px] border-platinum"
+                }`}
                 onClick={() => router.push(`/publication/${book?.id}`)}
               >
                 <PublicationCard book={book} />

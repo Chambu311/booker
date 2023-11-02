@@ -80,18 +80,22 @@ export type BookWithImages = Prisma.BookGetPayload<{
 export function PublicationCard(props: { book: BookWithImages }) {
   const { book } = props;
   return (
-    <div className=" flex h-[170px] w-full gap-5 p-5 font-montserrat border-platinum border-b-[1px] relative">
-        <div className="absolute -top-2 right-4 text-sm italic">{book?.genre?.name}</div>
+    <div className=" relative flex h-[170px] w-full gap-5 p-5 font-montserrat">
+      <div className="absolute -top-2 right-4 text-sm italic">
+        {book?.genre?.name}
+      </div>
       <div
         style={{ backgroundImage: `url('${book?.images.at(0)?.src}')` }}
-        className="h-full w-[20%] bg-contain bg-center bg-no-repeat"
+        className="h-full w-[20%] bg-contain  bg-center bg-no-repeat"
       />
-      <div className="flex flex-col gap-5 w-[70%]">
+      <div className="flex w-[70%] flex-col gap-5">
         <div className="flex flex-col gap-y-2">
           <p className="text-balance text-[20px] font-bold">{book?.title}</p>
           <p className="text-balance italic">{book?.author}</p>
         </div>
-        <p className="overflow-ellipsis overflow-hidden whitespace-nowrap">{book?.description}</p>
+        <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+          {book?.description}
+        </p>
       </div>
     </div>
   );

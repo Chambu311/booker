@@ -72,15 +72,27 @@ export const bookRouter = createTRPCRouter({
       });
     }),
   getBooksFeed: protectedProcedure
-    .input(z.object({ userId: z.string() }))
+    .input(
+      z.object({
+        userId: z.string(),
+        genre: z.string().nullable(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
-      return await ctx.prisma.book.findMany({
-        where: {
-          userId: {
-            not: input.userId,
-          },
-          status: "PUBLISHED",
+      const whereCondition: any = {
+        userId: {
+          not: input.userId,
         },
+        status: "PUBLISHED",
+      };
+
+      if (input.genre !== null) {
+        whereCondition.genre = {
+          name: input.genre,
+        };
+      }
+      return await ctx.prisma.book.findMany({
+        where: whereCondition,
         include: {
           images: true,
           genre: true,

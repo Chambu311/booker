@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import BookEffect from "~/components/ui/book-effect";
+import Tilt from "react-parallax-tilt";
 const CoolPage = () => {
   const [open, setIsOpen] = useState(false);
 
   return (
     <div className="relative grid h-screen w-screen place-content-center bg-black font-montserrat">
       {/* <FlipCard /> */}
-      <Carousel3d />
+      <Tilt className="relative [transform-style:preserve-3d]">
+        <div className="grid h-[450px] w-[400px] place-content-center rounded-normal bg-white [transform-style:preserve-3d]">
+          <div className="h-40 w-40 rounded-normal bg-black text-xl text-black  [transform:translateZ(200px)]"></div>
+        </div>
+      </Tilt>
     </div>
   );
 };
@@ -100,7 +105,9 @@ const Cardstack = () => {
     <div className="scene [perspective:1000px]">
       <div className="stack relative h-[250px] w-[250px] stroke-black [transform-style:preserve-3d]">
         {Array.from({ length: 5 }).map((_, index) => {
-          const transformStyle = `translate(${index * 20}px, -${index * 20}px) translateZ(-${index * 10}px)`;
+          const transformStyle = `translate(${index * 20}px, -${
+            index * 20
+          }px) translateZ(-${index * 10}px)`;
           return (
             <div
               key={index}

@@ -81,7 +81,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
           setRequestStatus(status);
           if (status === "ACCEPTED") {
             await confetti({
-              particleCount: 100,
+              particleCount: 200,
               spread: 160,
             });
           }

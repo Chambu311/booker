@@ -59,6 +59,19 @@ export const swapRouter = createTRPCRouter({
           updatedRequest.holderBookId,
         );
         await cancelAllSwapRequestsOfSwappedBook(ctx.prisma, input.swapId);
+        await createNotification(
+          ctx.prisma,
+          updatedRequest.holderId,
+          updatedRequest.requesterId,
+          "Ha confirmado el intercambio!",
+        );
+      } else if (input.status === "REJECTED") {
+        await createNotification(
+          ctx.prisma,
+          updatedRequest.holderId,
+          updatedRequest.requesterId,
+          "Ha rechazado el intercambio!",
+        );
       }
     }),
   createInitialSwapRequest: protectedProcedure
@@ -88,6 +101,12 @@ export const swapRouter = createTRPCRouter({
           holderBookId: input.holderBookId,
         },
       });
+      await createNotification(
+        ctx.prisma,
+        input.holderId,
+        input.requesterId,
+        "Te enviado una solicitud de intercambio",
+      );
       return newSwapRequest;
     }),
   findByUserId: protectedProcedure
@@ -154,6 +173,12 @@ export const swapRouter = createTRPCRouter({
           status: "PENDING_REQUESTER",
         },
       });
+      await createNotification(
+        ctx.prisma,
+        input.requesterId,
+        input.holderId,
+        "Ha seleccionado un libro de tu librería",
+      );
     }),
 });
 
@@ -260,4 +285,22 @@ const cancelAllSwapRequestsOfSwappedBook = async (
       },
     });
   }
+};
+
+const createNotification = async (
+  prisma: PrismaClient,
+  userId: string,
+  secondaryUserId: string,
+  content: string,
+) => {
+  const userFound = await prisma.user.findFirst({
+    where: { id: secondaryUserId },
+  });
+  const newNotif = await prisma.notification.create({
+    data: {
+      userId: userId,
+      content: `${userFound?.name} - ${content}`,
+    },
+  });
+  return newNotif;
 };

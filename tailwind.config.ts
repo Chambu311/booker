@@ -39,7 +39,7 @@ export default {
       },
       fontFamily: {
         hayward: "Hayward",
-        montserrat: "Montserrat",
+        montserrat: "Helvetica",
       },
       boxShadow: {
         normal: "0px 2px 5px #d9d9d9",

@@ -26,6 +26,7 @@
     "aws-sdk": "^2.1463.0",
     "bcryptjs": "^2.4.3",
     "canvas-confetti": "^1.9.0",
+    "fuse.js": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "next": "^13.4.13",
     "next-superjson": "^0.0.4",
@@ -34,6 +35,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.47.0",
     "react-hot-toast": "^2.4.1",
+    "react-parallax-tilt": "^1.7.172",
     "superjson": "^1.13.3",
     "uuid": "^9.0.1",
     "zod": "^3.21.4"

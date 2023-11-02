@@ -3,43 +3,54 @@ import { signOut, useSession } from "next-auth/react";
 import { mdiAccount, mdiBell, mdiLocationExit, mdiMagnify } from "@mdi/js";
 import MdIcon from "./mdIcon";
 import Image from "next/image";
-interface INavbar {
-  onSearchSubmit?: (input: unknown) => void;
-}
-export default function Navbar(props: INavbar) {
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
+import NotificationDropdown from "../notification-dropdown";
+
+export default function Navbar() {
   const session = useSession();
-  
+  const searchParams = useSearchParams();
+  const initialSearchValue = searchParams.get("search");
+  const [search, setSearch] = useState<string>(initialSearchValue ?? "");
+
+  const cleanStringForUrl = (input: string) => {
+    input = input.toLowerCase();
+    input = input.replace(/[áàäâ]/g, "a");
+    input = input.replace(/[éèëê]/g, "e");
+    input = input.replace(/[íìïî]/g, "i");
+    let cleanedString = input.replace(/[^a-z0-9\s-]/g, ""); // Keep spaces and hyphens
+    cleanedString = cleanedString.replace(/\s+/g, "-"); // Replace spaces with hyphens
+    return cleanedString;
+  };
+
   return (
-    <div className="justify-between fixed top-0 z-50  flex h-[80px] w-full items-center bg-carisma-400 font-montserrat text-white px-5">
+    <div className="fixed top-0 z-50 flex  h-[80px] w-full items-center justify-between bg-carisma-400 px-5 font-montserrat text-white">
       <Link href="/home">
         <div className="absolute left-5 top-0 cursor-pointer font-hayward text-[40px]">
           Booker
         </div>
       </Link>
       <div className="mx-10 flex w-[80%] justify-center">
-        <form
-          className="flex gap-4 align-middle"
-          onSubmit={props.onSearchSubmit}
+        <input
+          className="h-[30px] w-[300px] rounded-[5px] px-3 text-black focus:outline-black"
+          placeholder="The lord of the rings"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Link
+          href={`/home?search=${cleanStringForUrl(search)}`}
+          className="search mx-5 my-auto cursor-pointer items-center"
         >
-          <input
-            className="h-[30px] w-[300px] rounded-[5px] px-3 text-black focus:outline-black"
-            placeholder="The lord of the rings"
+          <MdIcon
+            path={mdiMagnify}
+            color="white"
+            size={1}
+            className="scale-[1.3]"
           />
-          <label htmlFor="search my-auto items-center">
-            <MdIcon
-              path={mdiMagnify}
-              color="white"
-              size={1}
-              className="scale-[1.3]"
-            />
-          </label>
-        </form>
+        </Link>
       </div>
       <div className="flex w-[25%] gap-5 text-white">
-        <div className="my-auto relative">
-            <div className="absolute"></div>
-            <MdIcon path={mdiBell} size={1.5} color="white" />
-        </div>
+        <NotificationDropdown userId={session.data?.user.id ?? ''} />
         <div className="grid place-content-center rounded-[50%] border border-white p-3">
           {session.data?.user.image ? (
             <Image
