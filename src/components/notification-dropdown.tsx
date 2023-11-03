@@ -39,7 +39,7 @@ const NotificationDropdown = (props: { userId: string }) => {
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="wrapper relative h-full max-h-[500px]  min-h-[100px] min-w-[400px] overflow-y-auto rounded-normal border-2 border-platinum bg-white p-4 shadow-lg">
+          <div className="wrapper relative h-full max-h-[500px] min-h-[100px] min-w-[400px] overflow-y-auto rounded-normal rounded-tr-none border-2 border-platinum bg-white p-4 shadow-lg">
             {areThereNotifications ? (
               notifications.map((notif, index) => (
                 <NotificationPreview

@@ -36,7 +36,10 @@ export default function BookCard(props: IBookCard) {
             <p className="text-balance text-lg italic">{book?.author}</p>
           </div>
           <div className="absolute bottom-5 flex w-full justify-evenly px-2">
-            <div onClick={() => props.onClickDelete(book?.id)}>
+            <div
+              style={{ display: book.status === "SWAPPED" ? "none" : "block" }}
+              onClick={() => props.onClickDelete(book?.id)}
+            >
               <MdIcon
                 path={mdiTrashCan}
                 color="white"

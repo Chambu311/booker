@@ -13,6 +13,7 @@ import AddBookModal from "./add-book-modal";
 import toast, { Toaster } from "react-hot-toast";
 import { LoadingSpinner } from "../ui/loading";
 import AWS, { S3 } from "aws-sdk";
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 export default function LibraryView(props: {
   userId: string;
@@ -20,6 +21,7 @@ export default function LibraryView(props: {
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState<FileList | null>();
+  const [animationParent] = useAutoAnimate()
   const router = useRouter();
   const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<string>("");
@@ -38,7 +40,6 @@ export default function LibraryView(props: {
   };
 
   const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log('files', e.target.files);
     setFileList(e.target.files);
   };
 
@@ -132,7 +133,7 @@ export default function LibraryView(props: {
         </div>
       </div>
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
-        <div className="grid h-full w-full grid-cols-3 gap-5 p-5">
+        <div ref={animationParent} className="grid max-h-[600px] overflow-y-auto w-full grid-cols-3 gap-5 p-5">
           {bookList?.map((book: BookWithImages) => {
             return (
               <div

@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import Navbar from "~/components/ui/Navbar";
 import MdIcon from "~/components/ui/mdIcon";
-import { mdiAccount, mdiBook } from "@mdi/js";
+import { mdiAccount, mdiBook, mdiCog } from "@mdi/js";
 import Image from "next/image";
 import { mdiBookmarkBoxMultiple } from "@mdi/js";
 import { mdiSwapHorizontalCircleOutline } from "@mdi/js";
@@ -11,6 +11,7 @@ import { GetServerSidePropsContext } from "next";
 import { prisma } from "~/server/db";
 import { User } from "@prisma/client";
 import SwapRequestsView from "~/components/profile/swap-requests-view";
+import ProfileSettings from "~/components/profile/profile-settings";
 
 const Profile = (props: { user: User }) => {
   const [tab, setTab] = useState<number>(0);
@@ -26,7 +27,7 @@ const Profile = (props: { user: User }) => {
         <Navbar />
       </header>
       <div className="w-full bg-white p-10 font-montserrat">
-        <div className="flex gap-10 justify-center">
+        <div className="flex justify-center gap-10">
           <div className="flex w-[20%] flex-col">
             <div className="w-full flex-col rounded-[10px] px-10 py-10 shadow-normal">
               <div className="flex justify-center">
@@ -64,19 +65,30 @@ const Profile = (props: { user: User }) => {
                   </span>
                 </div>
                 {isMyProfile ? (
-                  <div className="flex gap-3">
-                    <MdIcon
-                      path={mdiSwapHorizontalCircleOutline}
-                      size={1}
-                      color="black"
-                    />
-                    <span
-                      className="cursor-pointer"
-                      onClick={() => switchTab(1)}
-                    >
-                      Mis intercambios
-                    </span>
-                  </div>
+                  <>
+                    <div className="flex gap-3">
+                      <MdIcon
+                        path={mdiSwapHorizontalCircleOutline}
+                        size={1}
+                        color="black"
+                      />
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => switchTab(1)}
+                      >
+                        Mis intercambios
+                      </span>
+                    </div>
+                    <div className="flex gap-3">
+                      <MdIcon path={mdiCog} size={1} color="black" />
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => switchTab(2)}
+                      >
+                        Configuracíon
+                      </span>
+                    </div>
+                  </>
                 ) : null}
               </div>
             </div>
@@ -86,7 +98,9 @@ const Profile = (props: { user: User }) => {
               <LibraryView userId={user.id} isMyUser={isMyProfile} />
             ) : tab === 1 && isMyProfile ? (
               <SwapRequestsView user={user} />
-            ) : null}
+            ) : (
+              <ProfileSettings />
+            )}
           </div>
         </div>
         <style jsx>
@@ -124,4 +138,3 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-

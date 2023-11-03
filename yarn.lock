@@ -269,6 +269,11 @@
   "resolved" "https://registry.npmjs.org/@eslint/js/-/js-8.48.0.tgz"
   "version" "8.48.0"
 
+"@formkit/auto-animate@^0.8.0":
+  "integrity" "sha512-G8f7489ka0mWyi+1IEZT+xgIwcpWtRMmE2x+IrVoQ+KM1cP6VDj/TbujZjwxdb0P8w8b16/qBfViRmydbYHwMw=="
+  "resolved" "https://registry.npmjs.org/@formkit/auto-animate/-/auto-animate-0.8.0.tgz"
+  "version" "0.8.0"
+
 "@humanwhocodes/config-array@^0.11.10":
   "integrity" "sha512-N2brEuAadi0CcdeMXUkhbZB84eskAc8MEX1By6qEchoVywSgXPIjou4rYsl0V3Hj0ZnuGycGCjdNgockbzeWNA=="
   "resolved" "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.11.tgz"
