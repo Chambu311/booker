@@ -121,7 +121,7 @@ export default function LibraryView(props: {
       <Toaster />
       {props.isMyUser ? (
         <div
-          className="absolute -bottom-5 -right-5 cursor-pointer hover:scale-[1.3]"
+          className="absolute -bottom-5 right-10 cursor-pointer hover:scale-[1.3]"
           onClick={() => setIsModalOpen(true)}
         >
           <MdIcon path={mdiPlus} color="black" size={1.5} className="my-aut" />

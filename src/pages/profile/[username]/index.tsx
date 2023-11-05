@@ -33,9 +33,9 @@ const Profile = (props: { user: User }) => {
               <div className="flex justify-center">
                 <div className="flex-col">
                   <div className="mx-auto grid h-[150px] w-[150px] place-content-center rounded-[50%] border-[2px] border-black p-5">
-                    {user.image ? (
+                    {user?.image ? (
                       <Image
-                        src={user.image}
+                        src={user?.image}
                         alt=""
                         width={100}
                         height={100}
@@ -52,7 +52,7 @@ const Profile = (props: { user: User }) => {
                   </div>
                   <div className="flex justify-center">
                     <div className="mb-10 mt-5 text-center text-[25px]">
-                      {user.name}
+                      {user?.name}
                     </div>
                   </div>
                 </div>
@@ -85,7 +85,7 @@ const Profile = (props: { user: User }) => {
                         className="cursor-pointer"
                         onClick={() => switchTab(2)}
                       >
-                        Configuracíon
+                        Configuración
                       </span>
                     </div>
                   </>
@@ -95,11 +95,11 @@ const Profile = (props: { user: User }) => {
           </div>
           <div className="w-[80%] flex-col rounded-normal p-10 shadow-normal">
             {tab === 0 ? (
-              <LibraryView userId={user.id} isMyUser={isMyProfile} />
+              <LibraryView userId={user?.id} isMyUser={isMyProfile} />
             ) : tab === 1 && isMyProfile ? (
               <SwapRequestsView user={user} />
             ) : (
-              <ProfileSettings />
+              <ProfileSettings user={user} />
             )}
           </div>
         </div>

@@ -11,7 +11,7 @@ const options = {
   includeScore: true,
   includeMatches: true,
   findAllMathes: true,
-  threshold: 0.6,
+  threshold: 0.3,
   keys: ["title", "author", "description", "genre.name"],
 };
 
@@ -33,6 +33,17 @@ export default function Home() {
     const searchResults = fuse.search(searchValue);
     books = searchResults.map((result) => result.item);
   }
+
+  const onSelectGenre = (input: string) => {
+    const match = genres?.some((genre) => genre.name === input);
+    if (match) {
+      router.push(
+        searchValue
+          ? `?genre=${input}&search=${searchValue}`
+          : `?genre=${input}`,
+      );
+    }
+  };
 
   return (
     <div className="overflow-hidden">
@@ -64,6 +75,18 @@ export default function Home() {
           >
             Limpiar filtros
           </button>
+          {/* <fieldset onChange={(e: any) => onSelectGenre(e.target.value)}>
+            <input
+              list="genre-list"
+              placeholder="Género"
+              className="my-auto h-7 rounded-small bg-platinum px-3 text-xl"
+            />
+            <datalist id="genre-list" defaultValue={selectedGenre ?? ""}>
+              {genres?.map((genre, index) => (
+                <option key={index} value={genre.name}></option>
+              ))}
+            </datalist>
+          </fieldset> */}
         </div>
         <div className="relative flex h-full  w-full flex-col gap-y-5 border-[1px] border-platinum py-5">
           {!booksQuery.isLoading || !booksQuery.isRefetching ? (
