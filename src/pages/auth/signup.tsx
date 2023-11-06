@@ -44,7 +44,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="relative grid h-screen  w-screen place-content-center overflow-hidden bg-register bg-cover bg-no-repeat font-montserrat">
+    <div className="relative grid h-screen  w-screen place-content-center overflow-hidden bg-register bg-cover bg-no-repeat">
       <Toaster position="top-center" />
       <div className="relative flex min-h-[500px] w-[500px] flex-col rounded-normal bg-white align-middle">
         <div className="z-10 mt-10 text-center text-[30px] font-bold text-black">

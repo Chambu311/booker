@@ -72,6 +72,13 @@ export const swapRouter = createTRPCRouter({
           updatedRequest.requesterId,
           "Ha rechazado el intercambio!",
         );
+      } else if (input.status === 'CANCELLED') {
+        await createNotification(
+            ctx.prisma,
+            updatedRequest.requesterId,
+            updatedRequest.holderId,
+            "Ha cancelado tu solicitud.",
+          );
       }
     }),
   createInitialSwapRequest: protectedProcedure
@@ -200,6 +207,9 @@ const getAllSwapRequestsByUserId = async (prisma: PrismaClient, id: string) => {
       holderBook: true,
       requesterBook: true,
     },
+    orderBy: {
+        createdAt: 'desc'
+    }
   });
 };
 
@@ -214,6 +224,9 @@ const getSentSwapRequestByUserId = async (prisma: PrismaClient, id: string) => {
       holderBook: true,
       requesterBook: true,
     },
+    orderBy: {
+        createdAt: 'desc'
+    }
   });
 };
 
@@ -231,6 +244,9 @@ const getReceivedSwapRequestsByUserId = async (
       holderBook: true,
       requesterBook: true,
     },
+    orderBy: {
+        createdAt: 'desc'
+    }
   });
 };
 

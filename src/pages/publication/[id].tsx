@@ -48,7 +48,7 @@ export default function PublicationDetail(props: {
       <nav className="pb-20">
         <Navbar />
       </nav>
-      <div className="flex flex-col p-10 font-montserrat">
+      <div className="flex flex-col p-10">
         <Toaster position="top-center" />
         <div className="flex h-[500px] gap-10">
           <div className="w-[50%] bg-carisma-50">
@@ -60,7 +60,7 @@ export default function PublicationDetail(props: {
                 @{userQuery?.data?.name ?? userQuery?.data?.email}
               </span>
             </div>
-            <div className="font-montserrat text-[20px] text-black">
+            <div className="text-[20px] text-black">
               <b>Titulo: </b>
               {book?.title}
             </div>

@@ -90,7 +90,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     );
   };
   return (
-    <div className="flex flex-col gap-y-10 p-10 font-montserrat">
+    <div className="flex flex-col gap-y-10 p-10">
       <div className="fixed left-3 top-3 cursor-pointer rounded-small bg-platinum p-2 text-black">
         <Link href={`/profile/${session.data?.user.name}`}>Volver</Link>
       </div>
@@ -142,7 +142,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
               className="primary-btn"
               onClick={() => onUpdateSwapRequestStatus("CANCELLED")}
             >
-              Rechazar intercambio
+              Cancelar intercambio
             </button>
           </div>
         </>

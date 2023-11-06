@@ -26,30 +26,18 @@ const Profile = (props: { user: User }) => {
       <header className="pb-20">
         <Navbar />
       </header>
-      <div className="w-full bg-white p-10 font-montserrat">
+      <div className="w-full bg-white p-10">
         <div className="flex justify-center gap-10">
           <div className="flex w-[20%] flex-col">
             <div className="w-full flex-col rounded-[10px] px-10 py-10 shadow-normal">
               <div className="flex justify-center">
                 <div className="flex-col">
-                  <div className="mx-auto grid h-[150px] w-[150px] place-content-center rounded-[50%] border-[2px] border-black p-5">
-                    {user?.image ? (
-                      <Image
-                        src={user?.image}
-                        alt=""
-                        width={100}
-                        height={100}
-                        className="rounded-[50%]"
-                      />
-                    ) : (
-                      <MdIcon
-                        path={mdiAccount}
-                        color="black"
-                        className="text-pink"
-                        size={3}
-                      />
-                    )}
-                  </div>
+                  <div
+                    style={{
+                      backgroundImage: `url('${user.image ? user.image : ""}')`,
+                    }}
+                    className="mx-auto h-[150px] w-[150px] rounded-[50%] border-[2px]  border-black bg-cover bg-center bg-no-repeat p-5"
+                  ></div>
                   <div className="flex justify-center">
                     <div className="mb-10 mt-5 text-center text-[25px]">
                       {user?.name}

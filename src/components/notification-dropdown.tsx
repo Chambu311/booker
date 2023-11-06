@@ -15,7 +15,6 @@ const NotificationDropdown = (props: { userId: string }) => {
     api.notification.deleteAllByUserId.useMutation();
   const notifications = notificationsQuery.data;
   const areThereNotifications = notifications && notifications.length > 0;
-  console.log("notif", notifications);
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };

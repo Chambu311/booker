@@ -6,7 +6,7 @@ const CoolPage = () => {
   const [open, setIsOpen] = useState(false);
 
   return (
-    <div className="relative grid h-screen w-screen place-content-center bg-black font-montserrat">
+    <div className="relative grid h-screen w-screen place-content-center bg-black">
       {/* <FlipCard /> */}
       <Tilt className="relative [transform-style:preserve-3d]">
         <div className="grid h-[450px] w-[400px] place-content-center rounded-normal bg-white [transform-style:preserve-3d]">

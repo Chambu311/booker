@@ -25,7 +25,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 z-50 flex  h-[80px] w-full items-center justify-between bg-carisma-400 px-5 font-montserrat text-white">
+    <div className="fixed top-0 z-50 flex  h-[80px] w-full items-center justify-between bg-carisma-400 px-5 text-white">
       <Link href="/home">
         <div className="absolute left-5 top-0 cursor-pointer font-hayward text-[40px]">
           Booker
@@ -50,19 +50,16 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex w-[25%] gap-5 text-white">
-        <NotificationDropdown userId={session.data?.user.id ?? ''} />
-        <div className="grid place-content-center rounded-[50%] border border-white p-3">
-          {session.data?.user.image ? (
-            <Image
-              src={session.data.user.image}
-              alt=""
-              width={30}
-              height={30}
-              className="rounded-[50%]"
-            />
-          ) : (
+        <NotificationDropdown userId={session.data?.user.id ?? ""} />
+        <div
+          style={{
+            backgroundImage: `url('${session.data?.user.image ?? ""}')`,
+          }}
+          className="grid place-content-center bg-center bg-cover bg-no-repeat rounded-[50%] border border-white w-14 h-14"
+        >
+          {!session.data?.user.image ? (
             <MdIcon path={mdiAccount} size={1} color={"white"} />
-          )}
+          ) : null}
         </div>
         <Link href={`/profile/${session.data?.user.name}`} className="my-auto">
           <div className="text-xl">@{session.data?.user.name}</div>

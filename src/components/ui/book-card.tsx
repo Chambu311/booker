@@ -83,7 +83,7 @@ export type BookWithImages = Prisma.BookGetPayload<{
 export function PublicationCard(props: { book: BookWithImages }) {
   const { book } = props;
   return (
-    <div className=" relative flex h-[170px] w-full gap-5 p-5 font-montserrat">
+    <div className=" relative flex h-[170px] w-full gap-5 p-5">
       <div className="absolute -top-2 right-4 text-sm italic">
         {book?.genre?.name}
       </div>

@@ -68,8 +68,9 @@ export type SwapRequestFullInfo = Prisma.SwapRequestGetPayload<{
 
 const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
+  const isSwapOver = ['CANCELLED','REJECTED', 'ACCEPTED'].includes(swap.status)
   return (
-    <div className="banner flex h-full shadow-normal">
+    <div className={`banner flex h-full shadow-normal text-balance ${isSwapOver ? 'grayscale' : ''}`}>
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>De :</p>
@@ -101,8 +102,9 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
 
 const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
+  const isSwapOver = ['CANCELLED','REJECTED', 'ACCEPTED'].includes(swap.status)
   return (
-    <div className="banner flex h-full shadow-normal text-balance">
+    <div className={`banner flex h-full shadow-normal text-balance ${isSwapOver ? 'grayscale' : ''}`}>
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>Hacia :</p>

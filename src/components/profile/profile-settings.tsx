@@ -7,6 +7,7 @@ import { mdiEye, mdiPlus } from "@mdi/js";
 import { api } from "~/utils/api";
 import { toast, Toaster } from "react-hot-toast";
 import { useSession, signOut } from "next-auth/react";
+import AWS, { S3 } from "aws-sdk";
 
 type UserFormValues = {
   email: string;
@@ -19,15 +20,15 @@ const ProfileSettings = (props: { user: User }) => {
   const form = useForm<UserFormValues>({
     defaultValues: {
       name: user?.name,
-      email: user?.email ?? '',
+      email: user?.email ?? "",
     },
   });
   const pictureRef = useRef(null) as any;
   const [passwordInputType, setPasswordInputType] = useState("password");
   const session = useSession();
   const userMutation = api.user.updateUser.useMutation();
-  const [picture, setPicture] = useState<FileList>();
-  const [url, setUrl] = useState<string>("");
+  const [picture, setPicture] = useState<File>();
+  const [url, setUrl] = useState<string>(user.image ?? '');
   const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
   const [edit, setEdit] = useState(false);
 
@@ -40,19 +41,38 @@ const ProfileSettings = (props: { user: User }) => {
   };
 
   const handleFileUploadchange = (e: any) => {
-    setPicture(e.target.files);
+    setPicture([...e.target.files].at(0));
     const files = [...e.target.files];
     const url = URL.createObjectURL(files.at(0));
     setUrl(url);
   };
-  const onSettingsSubmit = (data: UserFormValues) => {
+
+  const onSettingsSubmit = async (data: UserFormValues) => {
     toast.loading("Guardando...", {
       id: "loading",
     });
+    AWS.config.update({
+      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    });
+    let img = undefined;
+    if (picture) {
+      const s3 = new S3();
+      const uploadResult = await s3
+        .upload({
+          Bucket: "booker-tesis",
+          Body: picture,
+          Key: `booker-avatar-${user.name}-${crypto.randomUUID()}`,
+          ContentType: "image/png",
+        })
+        .promise();
+      img = uploadResult.Location;
+    }
     userMutation.mutate(
       {
         ...data,
         id: user.id,
+        picture: img,
       },
       {
         onSuccess: () => {
@@ -71,8 +91,8 @@ const ProfileSettings = (props: { user: User }) => {
   const onClickEdit = () => {
     if (edit) {
       setEdit(false);
-      form.setValue('name', user.name);
-      form.setValue('email', user?.email ?? '')
+      form.setValue("name", user.name);
+      form.setValue("email", user?.email ?? "");
     } else {
       setEdit(true);
     }
@@ -177,7 +197,11 @@ const ProfileSettings = (props: { user: User }) => {
               </div>
             ) : null}
 
-            <button type="submit" className="primary-btn mt-10 w-[50%]">
+            <button
+              disabled={!edit}
+              type="submit"
+              className="primary-btn mt-10 w-[50%] disabled:bg-grey disabled:text-black"
+            >
               Guardar cambios
             </button>
           </form>
@@ -191,7 +215,7 @@ const ProfileSettings = (props: { user: User }) => {
           />
           <div
             onClick={() => pictureRef.current.click()}
-            style={{ backgroundImage: `url('${url}')` }}
+            style={{ backgroundImage: `url('${url}')`, pointerEvents: !edit ? 'none' : 'auto' }}
             className="relative grid h-[300px] w-[300px] cursor-pointer place-content-center rounded-[50%] border-[1px] border-dashed border-black bg-contain bg-center bg-no-repeat hover:border-blue"
           >
             <MdIcon path={mdiPlus} color="black" size={2} />
