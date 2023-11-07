@@ -52,6 +52,7 @@ export const userRouter = createTRPCRouter({
           name: input.name.trim(),
           role: "USER",
           emailVerified: new Date(),
+          image: 'https://booker-tesis.s3.amazonaws.com/default-booker-avatar.jpeg',
         },
       });
       return newUser;

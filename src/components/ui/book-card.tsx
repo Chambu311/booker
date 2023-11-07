@@ -7,7 +7,8 @@ import { api } from "~/utils/api";
 
 interface IBookCard {
   book: BookWithImages;
-  onClickDelete: (id: string) => void;
+  onClickDelete: (book: BookWithImages) => void;
+  onClickEdit: (book: BookWithImages) => void;
 }
 export default function BookCard(props: IBookCard) {
   const { book } = props;
@@ -38,7 +39,7 @@ export default function BookCard(props: IBookCard) {
           <div className="absolute bottom-5 flex w-full justify-evenly px-2">
             <div
               style={{ display: book.status === "SWAPPED" ? "none" : "block" }}
-              onClick={() => props.onClickDelete(book?.id)}
+              onClick={() => props.onClickDelete(book)}
             >
               <MdIcon
                 path={mdiTrashCan}
@@ -47,7 +48,7 @@ export default function BookCard(props: IBookCard) {
                 size={1.2}
               />
             </div>
-            <div>
+            <div onClick={() => props.onClickEdit(book)}>
               <MdIcon
                 path={mdiPencil}
                 color="white"

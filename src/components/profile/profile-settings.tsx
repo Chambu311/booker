@@ -25,7 +25,6 @@ const ProfileSettings = (props: { user: User }) => {
   });
   const pictureRef = useRef(null) as any;
   const [passwordInputType, setPasswordInputType] = useState("password");
-  const session = useSession();
   const userMutation = api.user.updateUser.useMutation();
   const [picture, setPicture] = useState<File>();
   const [url, setUrl] = useState<string>(user.image ?? '');

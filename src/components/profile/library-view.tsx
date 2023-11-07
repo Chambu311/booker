@@ -3,28 +3,27 @@ import MdIcon from "../ui/mdIcon";
 import { api } from "~/utils/api";
 import { ChangeEvent, useState } from "react";
 import Modal from "../ui/modal";
-import BookCard, {
-  BookWithImages,
-  LightBookCard,
-} from "../ui/book-card";
+import BookCard, { BookWithImages, LightBookCard } from "../ui/book-card";
 import { Book } from "@prisma/client";
 import { useRouter } from "next/router";
-import AddBookModal from "./add-book-modal";
+import AddBookModal, { CreateBookInput } from "./add-book-modal";
 import toast, { Toaster } from "react-hot-toast";
 import { LoadingSpinner } from "../ui/loading";
 import AWS, { S3 } from "aws-sdk";
-import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useForm } from "react-hook-form";
 
 export default function LibraryView(props: {
   userId: string;
   isMyUser: boolean;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const form = useForm<CreateBookInput>();
   const [fileList, setFileList] = useState<FileList | null>();
-  const [animationParent] = useAutoAnimate()
+  const [animationParent] = useAutoAnimate();
   const router = useRouter();
   const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
-  const [bookToDelete, setBookToDelete] = useState<string>("");
+  const [selectedBook, setSelectedBook] = useState<BookWithImages>();
   const genreListQuery = api.genre.getAll.useQuery();
   const bookMutation = api.book.createBook.useMutation();
   const deleteBookMutation = api.book.deleteBook.useMutation();
@@ -34,8 +33,8 @@ export default function LibraryView(props: {
   });
   const bookList = bookQuery.data;
 
-  const onClickDeleteBook = (id: string) => {
-    setBookToDelete(id);
+  const onClickDeleteBook = (book: BookWithImages) => {
+    setSelectedBook(book);
     setIsDeleteBookModalOpen(true);
   };
 
@@ -50,7 +49,7 @@ export default function LibraryView(props: {
       id: "delete-book",
     });
     deleteBookMutation.mutate(
-      { id: bookToDelete },
+      { id: selectedBook?.id ?? ''},
       {
         async onSuccess() {
           await bookQuery.refetch();
@@ -62,10 +61,16 @@ export default function LibraryView(props: {
 
   const onClickCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedBook(undefined)
+    form.reset()
   };
 
-  const onFormSubmit = async (input: any) => {
-    input.preventDefault();
+  const onClickEditBook = (book: BookWithImages) => {
+    setSelectedBook(book);
+    setIsModalOpen(true)
+  }
+
+  const onFormSubmit = async (data: CreateBookInput) => {
     const keys: string[] = [];
     if (!fileList) {
       toast.error("Ingrese al menos una imagen");
@@ -79,17 +84,12 @@ export default function LibraryView(props: {
     toast.loading("Guardando...", {
       id: "create-book",
     });
-    const formData = new FormData(input.target);
-    const title = formData.get("title") as string;
-    const author = formData.get("author") as string;
-    const genre = formData.get("genre") as string;
-    const description = formData.get("description") as string;
     for (const file of [...fileList]) {
       const uploadResult = await s3
         .upload({
           Bucket: "booker-tesis",
           Body: file,
-          Key: `booker-image-${title}-${crypto.randomUUID()}`,
+          Key: `booker-image-${data.title}-${crypto.randomUUID()}`,
           ContentType: "image/png",
         })
         .promise();
@@ -99,19 +99,19 @@ export default function LibraryView(props: {
     }
     bookMutation.mutate(
       {
-        title,
-        author,
-        genre: genre,
+        title: data.title,
+        author: data.author,
+        genre: data.genre,
         userId: props.userId,
-        description,
+        description: data.description,
         imgs: keys,
       },
       {
         async onSuccess() {
           await bookQuery.refetch();
           setIsModalOpen(false);
-          input.target.reset();
           toast.dismiss("create-book");
+          form.reset()
         },
       },
     );
@@ -133,7 +133,10 @@ export default function LibraryView(props: {
         </div>
       </div>
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
-        <div ref={animationParent} className="grid max-h-[600px] overflow-y-auto w-full grid-cols-3 gap-5 p-5">
+        <div
+          ref={animationParent}
+          className="grid max-h-[600px] w-full grid-cols-3 gap-5 overflow-y-auto p-5"
+        >
           {bookList?.map((book: BookWithImages) => {
             return (
               <div
@@ -142,7 +145,7 @@ export default function LibraryView(props: {
               >
                 {props.isMyUser ? (
                   <>
-                    <BookCard book={book} onClickDelete={onClickDeleteBook} />
+                    <BookCard book={book} onClickDelete={onClickDeleteBook} onClickEdit={onClickEditBook} />
                     {book.status === "PUBLISHED" ? (
                       <div className="flex">
                         <div className="rounded-small bg-green p-1 text-center text-sm font-bold text-white">
@@ -184,6 +187,8 @@ export default function LibraryView(props: {
           genreList={genreListQuery.data}
           onFileChange={onFileUploadChange}
           files={fileList}
+          form={form}
+          book={selectedBook ?? undefined}
         />
       </div>
       <div style={{ display: isDeleteBookModalOpen ? "block" : "none" }}>

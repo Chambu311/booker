@@ -2,19 +2,40 @@ import { Genre } from "@prisma/client";
 import Modal from "../ui/modal";
 import Carousel from "../ui/carousel";
 import { useEffect, useRef, useState } from "react";
+import { BookWithImages } from "../ui/book-card";
+import { UseFormReturn, useForm } from "react-hook-form";
 interface IAddBookModal {
   onFormSubmit: (e: any) => void;
   onClickCloseModal: () => void;
   genreList: Genre[] | undefined;
   files?: FileList | null | undefined;
   onFileChange: (e: any) => void;
+  book?: BookWithImages | undefined;
+  form: UseFormReturn<CreateBookInput, any, undefined>;
 }
+
+export type CreateBookInput = {
+  title: string;
+  author: string;
+  genre: string;
+  description: string;
+};
+
 const AddBookModal = (props: IAddBookModal) => {
+  const { form, book } = props;
+  const bookImages: { src: string }[] = [];
   const [slides, setSlides] = useState<
     {
       src: string;
     }[]
   >([]);
+  if (book && !props.files) {
+    form.setValue("author", book.author);
+    form.setValue("title", book.title);
+    form.setValue("genre", book.genre.name);
+    form.setValue("description", book.description ?? "");
+    book.images.forEach((image) => bookImages.push({ src: image.src}))
+  }
   const uploadRef = useRef(null) as any;
   useEffect(() => {
     if (props.files) {
@@ -29,17 +50,18 @@ const AddBookModal = (props: IAddBookModal) => {
   }, [props.files]);
 
   return (
-    <Modal title="Añadir libro" style="w-[900px]">
+    <Modal title={book ? "Editar libro" : "Añadir libro"} style="w-[900px]">
       <div className="flex h-full w-full gap-5">
         <form
           className="flex w-[50%] flex-col gap-y-5 overflow-y-auto overflow-x-hidden"
-          onSubmit={props.onFormSubmit}
+          onSubmit={form.handleSubmit(props.onFormSubmit)}
         >
           <div className="flex flex-col gap-2">
             <label htmlFor="title" className="text-[15px]">
               Título
             </label>
             <input
+              {...form.register("title")}
               type="text"
               name="title"
               maxLength={40}
@@ -52,6 +74,7 @@ const AddBookModal = (props: IAddBookModal) => {
               Autor/es
             </label>
             <input
+              {...form.register("author")}
               type="text"
               name="author"
               required
@@ -63,6 +86,7 @@ const AddBookModal = (props: IAddBookModal) => {
               Género
             </label>
             <select
+              {...form.register("genre")}
               name="genre"
               className="h-10 w-full rounded-small bg-platinum px-3"
             >
@@ -78,10 +102,11 @@ const AddBookModal = (props: IAddBookModal) => {
               Descripción
             </label>
             <textarea
+              {...form.register("description")}
               name="description"
               placeholder="Decínos de que se trata"
               maxLength={200}
-              className=" w-full rounded-small bg-platinum p-3 max-h-[200px]"
+              className=" max-h-[200px] w-full rounded-small bg-platinum p-3"
             />
           </div>
           <div className="mt-10 flex gap-10">
@@ -103,7 +128,7 @@ const AddBookModal = (props: IAddBookModal) => {
         <div className="relative flex h-full w-[50%] justify-center">
           <div className="m-auto flex h-full w-full flex-col gap-y-10">
             <div className="h-[400px] rounded-normal bg-carisma-50">
-              <Carousel slides={slides} />
+              <Carousel slides={bookImages.length > 0 ? bookImages : slides} />
             </div>
             <div className="flex h-[30%] justify-end">
               <input
