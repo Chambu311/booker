@@ -8,11 +8,7 @@ const CoolPage = () => {
   return (
     <div className="relative grid h-screen w-screen place-content-center bg-black">
       {/* <FlipCard /> */}
-      <Tilt className="relative [transform-style:preserve-3d]">
-        <div className="grid h-[450px] w-[400px] place-content-center rounded-normal bg-white [transform-style:preserve-3d]">
-          <div className="h-40 w-40 rounded-normal bg-black text-xl text-black  [transform:translateZ(200px)]"></div>
-        </div>
-      </Tilt>
+    <Carousel3d />
     </div>
   );
 };

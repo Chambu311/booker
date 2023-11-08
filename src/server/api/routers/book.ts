@@ -16,6 +16,9 @@ export const bookRouter = createTRPCRouter({
       const books = await ctx.prisma.book.findMany({
         where: {
           userId: input.userId,
+          status: {
+            not: "DELETED",
+          },
         },
         include: {
           genre: true,
@@ -58,8 +61,18 @@ export const bookRouter = createTRPCRouter({
   deleteBook: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.book.delete({ where: { id: input.id } });
+      const deletedBook = await ctx.prisma.book.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: "DELETED",
+        },
+      });
+      await updateSwapsWithDeletedBook(ctx.prisma, input.id);
+      return deletedBook;
     }),
+
   findById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -116,6 +129,37 @@ export const bookRouter = createTRPCRouter({
         },
       });
     }),
+
+  updateBook: protectedProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        author: z.string(),
+        genre: z.string(),
+        imgs: z.string().array(),
+        description: z.string().optional(),
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const genreId = await getGenreId(ctx.prisma, input.genre);
+      const updatedBook = await ctx.prisma.book.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          title: input.title,
+          author: input.author,
+          description: input.description,
+          genreId,
+        },
+      });
+      if (input.imgs.length > 0) {
+        await deleteBookImages(ctx.prisma, input.id);
+        await createBookImages(ctx.prisma, input.imgs, input.id);
+      }
+      return updatedBook;
+    }),
 });
 
 async function getGenreId(prisma: PrismaClient, genreName: string) {
@@ -123,6 +167,14 @@ async function getGenreId(prisma: PrismaClient, genreName: string) {
     where: { name: genreName },
   });
   return genreFound?.id;
+}
+
+async function deleteBookImages(prisma: PrismaClient, bookId: string) {
+  await prisma.bookImage.deleteMany({
+    where: {
+      bookId,
+    },
+  });
 }
 
 async function createBookImages(
@@ -138,4 +190,28 @@ async function createBookImages(
       },
     });
   }
+}
+
+async function updateSwapsWithDeletedBook(
+  prisma: PrismaClient,
+  bookId: string,
+) {
+  await prisma.swapRequest.updateMany({
+    where: {
+      OR: [
+        {
+          requesterBookId: bookId,
+        },
+        {
+          holderBookId: bookId,
+        },
+      ],
+      status: {
+        notIn: ['CANCELLED', 'REJECTED']
+      }
+    },
+    data: {
+      status: "BOOK_NOT_AVAILABLE",
+    },
+  });
 }

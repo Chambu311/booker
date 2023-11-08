@@ -26,6 +26,7 @@ export default function LibraryView(props: {
   const [selectedBook, setSelectedBook] = useState<BookWithImages>();
   const genreListQuery = api.genre.getAll.useQuery();
   const bookMutation = api.book.createBook.useMutation();
+  const updateBookMutation = api.book.updateBook.useMutation();
   const deleteBookMutation = api.book.deleteBook.useMutation();
   const bookQuery = api.book.getAllByUserId.useQuery({
     userId: props.userId,
@@ -49,10 +50,11 @@ export default function LibraryView(props: {
       id: "delete-book",
     });
     deleteBookMutation.mutate(
-      { id: selectedBook?.id ?? ''},
+      { id: selectedBook?.id ?? "" },
       {
         async onSuccess() {
           await bookQuery.refetch();
+          setSelectedBook(undefined);
           toast.dismiss("delete-book");
         },
       },
@@ -61,60 +63,85 @@ export default function LibraryView(props: {
 
   const onClickCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedBook(undefined)
-    form.reset()
+    setSelectedBook(undefined);
+    form.reset();
   };
 
   const onClickEditBook = (book: BookWithImages) => {
     setSelectedBook(book);
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const onFormSubmit = async (data: CreateBookInput) => {
     const keys: string[] = [];
-    if (!fileList) {
+    if (!fileList && !selectedBook) {
       toast.error("Ingrese al menos una imagen");
       return;
     }
-    AWS.config.update({
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    });
-    const s3 = new S3();
     toast.loading("Guardando...", {
-      id: "create-book",
+        id: "create-book",
     });
-    for (const file of [...fileList]) {
-      const uploadResult = await s3
-        .upload({
-          Bucket: "booker-tesis",
-          Body: file,
-          Key: `booker-image-${data.title}-${crypto.randomUUID()}`,
-          ContentType: "image/png",
-        })
-        .promise();
 
-      const img = uploadResult.Location;
-      keys.push(img);
+    if (fileList)  {
+        AWS.config.update({
+          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+        });
+        const s3 = new S3();
+        for (const file of [...fileList]) {
+          const uploadResult = await s3
+            .upload({
+              Bucket: "booker-tesis",
+              Body: file,
+              Key: `booker-image-${data.title}-${crypto.randomUUID()}`,
+              ContentType: "image/png",
+            })
+            .promise();
+    
+          const img = uploadResult.Location;
+          keys.push(img);
+        }
     }
-    bookMutation.mutate(
-      {
-        title: data.title,
-        author: data.author,
-        genre: data.genre,
-        userId: props.userId,
-        description: data.description,
-        imgs: keys,
-      },
-      {
-        async onSuccess() {
-          await bookQuery.refetch();
-          setIsModalOpen(false);
-          toast.dismiss("create-book");
-          form.reset()
+    if (!selectedBook) {
+      bookMutation.mutate(
+        {
+          title: data.title,
+          author: data.author,
+          genre: data.genre,
+          userId: props.userId,
+          description: data.description,
+          imgs: keys,
         },
-      },
-    );
+        {
+          async onSuccess() {
+            await bookQuery.refetch();
+            setIsModalOpen(false);
+            toast.dismiss("create-book");
+            form.reset();
+          },
+        },
+      );
+    } else {
+      updateBookMutation.mutate(
+        {
+          title: data.title,
+          author: data.author,
+          genre: data.genre,
+          description: data.description,
+          imgs: keys,
+          id: selectedBook.id,
+        },
+        {
+          async onSuccess() {
+            await bookQuery.refetch();
+            setIsModalOpen(false);
+            setSelectedBook(undefined);
+            toast.dismiss("create-book");
+          },
+        },
+      );
+    }
+    setFileList(undefined);
   };
   return (
     <div className="relative max-w-full">
@@ -145,7 +172,11 @@ export default function LibraryView(props: {
               >
                 {props.isMyUser ? (
                   <>
-                    <BookCard book={book} onClickDelete={onClickDeleteBook} onClickEdit={onClickEditBook} />
+                    <BookCard
+                      book={book}
+                      onClickDelete={onClickDeleteBook}
+                      onClickEdit={onClickEditBook}
+                    />
                     {book.status === "PUBLISHED" ? (
                       <div className="flex">
                         <div className="rounded-small bg-green p-1 text-center text-sm font-bold text-white">
@@ -180,7 +211,7 @@ export default function LibraryView(props: {
           <div className="">Loading</div>
         </div>
       )}
-      <div style={{ display: isModalOpen ? "block" : "none" }}>
+      <div className="modal" style={{ display: isModalOpen ? "block" : "none" }}>
         <AddBookModal
           onClickCloseModal={onClickCloseModal}
           onFormSubmit={onFormSubmit}

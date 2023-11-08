@@ -68,9 +68,15 @@ export type SwapRequestFullInfo = Prisma.SwapRequestGetPayload<{
 
 const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
-  const isSwapOver = ['CANCELLED','REJECTED', 'ACCEPTED'].includes(swap.status)
+  const isSwapOver = ["CANCELLED", "REJECTED", "ACCEPTED"].includes(
+    swap.status,
+  );
   return (
-    <div className={`banner flex h-full shadow-normal text-balance ${isSwapOver ? 'grayscale' : ''}`}>
+    <div
+      className={`banner text-balance flex h-full shadow-normal ${
+        isSwapOver ? "grayscale" : ""
+      }`}
+    >
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>De :</p>
@@ -80,9 +86,7 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
         </div>
         <div className="flex gap-4">
           <p>Su selección :</p>
-          <b>
-            {swap.holderBook.title}
-          </b>
+          <b>{swap.holderBook.title}</b>
         </div>
         {swap.requesterBook ? (
           <div className="flex gap-4">
@@ -102,9 +106,15 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
 
 const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
-  const isSwapOver = ['CANCELLED','REJECTED', 'ACCEPTED'].includes(swap.status)
+  const isSwapOver = ["CANCELLED", "REJECTED", "ACCEPTED"].includes(
+    swap.status,
+  );
   return (
-    <div className={`banner flex h-full shadow-normal text-balance ${isSwapOver ? 'grayscale' : ''}`}>
+    <div
+      className={`banner text-balance flex h-full shadow-normal ${
+        isSwapOver ? "grayscale" : ""
+      }`}
+    >
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>Hacia :</p>
@@ -114,16 +124,12 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
         </div>
         <div className="flex gap-4">
           <p>Tu selección :</p>
-          <b>
-            {swap.holderBook.title}
-          </b>
+          <b>{swap.holderBook.title}</b>
         </div>
         {swap.requesterBook ? (
           <div className="flex gap-4">
             <p>Su selección :</p>
-            <b>
-              {swap.requesterBook.title}
-            </b>
+            <b>{swap.requesterBook.title}</b>
           </div>
         ) : null}
       </div>
@@ -154,17 +160,21 @@ const ReceivedSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
     message = "Cancelado";
     buttonText = "Ver estado";
   } else {
-    return null; // Handle unknown status or return a default component
+    message = "El libro dejó de estar disponible";
   }
 
-  return (
-    <div className="flex flex-col gap-y-5">
-      <p>{message}</p>
-      <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-        <button className="primary-btn w-full">{buttonText}</button>
-      </Link>
-    </div>
-  );
+  if (buttonText) {
+    return (
+      <div className="flex flex-col gap-y-5">
+        <p>{message}</p>
+        <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
+          <button className="primary-btn w-full">{buttonText}</button>
+        </Link>
+      </div>
+    );
+  } else {
+    return <p>{message}</p>;
+  }
 };
 const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
   const status = swap.status;
@@ -186,7 +196,7 @@ const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
     message = "Cancelado.";
     buttonText = "Ver estado";
   } else {
-    message = 'El libro dejó de estar disponible';
+    message = "El libro dejó de estar disponible";
   }
 
   if (buttonText) {

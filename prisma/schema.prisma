@@ -150,4 +150,5 @@ enum BookStatus {
     PUBLISHED
     NOT_PUBLISHED
     SWAPPED
+    DELETED
 }
