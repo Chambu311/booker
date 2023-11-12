@@ -48,14 +48,16 @@ export default function BookCard(props: IBookCard) {
                 size={1.2}
               />
             </div>
-            <div onClick={() => props.onClickEdit(book)}>
-              <MdIcon
-                path={mdiPencil}
-                color="white"
-                className="icon"
-                size={1.2}
-              />
-            </div>
+            {book.status !== "SWAPPED" ? (
+              <div onClick={() => props.onClickEdit(book)}>
+                <MdIcon
+                  path={mdiPencil}
+                  color="white"
+                  className="icon"
+                  size={1.2}
+                />
+              </div>
+            ) : null}
             <div
               onClick={async () => {
                 await router.push(`/profile/book/${book?.id}`);

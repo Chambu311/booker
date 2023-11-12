@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import NotificationDropdown from "../notification-dropdown";
+import { User } from "@prisma/client";
 
 export default function Navbar() {
   const session = useSession();
@@ -50,7 +51,7 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex w-[25%] gap-5 text-white">
-        <NotificationDropdown userId={session.data?.user.id ?? ""} />
+        <NotificationDropdown user={session.data?.user as User} />
         <div
           style={{
             backgroundImage: `url('${session.data?.user.image ?? ""}')`,
@@ -61,7 +62,7 @@ export default function Navbar() {
             <MdIcon path={mdiAccount} size={1} color={"white"} />
           ) : null}
         </div>
-        <Link href={`/profile/${session.data?.user.name}`} className="my-auto">
+        <Link href={`/profile/${session.data?.user.name}?view=library`} className="my-auto">
           <div className="text-xl">@{session.data?.user.name}</div>
         </Link>
         <div

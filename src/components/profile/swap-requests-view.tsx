@@ -68,19 +68,24 @@ export type SwapRequestFullInfo = Prisma.SwapRequestGetPayload<{
 
 const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
-  const isSwapOver = ["CANCELLED", "REJECTED", "ACCEPTED"].includes(
+  const isSwapOver = ["CANCELLED", "REJECTED", "BOOK_NOT_AVAILABLE"].includes(
     swap.status,
   );
+  const isSwapAccepted = swap.status === "ACCEPTED";
   return (
     <div
       className={`banner text-balance flex h-full shadow-normal ${
-        isSwapOver ? "grayscale" : ""
+        isSwapOver
+          ? "grayscale"
+          : isSwapAccepted
+          ? "!border-inch-worm-400 !bg-inch-worm-50"
+          : ""
       }`}
     >
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>De :</p>
-          <Link href={`/profile/${swap.requester.name}`} className="text-blue">
+          <Link href={`/profile/${swap.requester.name}?view=library`} className="text-blue">
             @{swap.requester.name}
           </Link>
         </div>
@@ -97,7 +102,7 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
           </div>
         ) : null}
       </div>
-      <div className="relative grid h-full w-[50%] place-content-center border-[1px] border-l-carisma-500 p-5">
+      <div className="relative grid h-full w-[50%] place-content-center border-[1px] p-5">
         <ReceivedSwapRequestStatusAction {...swap} />
       </div>
     </div>
@@ -106,19 +111,24 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
 
 const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const { swap } = props;
-  const isSwapOver = ["CANCELLED", "REJECTED", "ACCEPTED"].includes(
+  const isSwapOver = ["CANCELLED", "REJECTED", "BOOK_NOT_AVAILABLE"].includes(
     swap.status,
   );
+  const isSwapAccepted = swap.status === "ACCEPTED";
   return (
     <div
       className={`banner text-balance flex h-full shadow-normal ${
-        isSwapOver ? "grayscale" : ""
+        isSwapOver
+          ? "grayscale"
+          : isSwapAccepted
+          ? "!border-inch-worm-400 !bg-inch-worm-50"
+          : ""
       }`}
     >
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>Hacia :</p>
-          <Link href={`/profile/${swap.holder.name}`} className="text-blue">
+          <Link href={`/profile/${swap.holder.name}?view=library`} className="text-blue">
             @{swap.holder.name}
           </Link>
         </div>
@@ -168,7 +178,13 @@ const ReceivedSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
       <div className="flex flex-col gap-y-5">
         <p>{message}</p>
         <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-          <button className="primary-btn w-full">{buttonText}</button>
+          <button
+            className={`primary-btn w-full ${
+              status === "ACCEPTED" ? "!bg-inch-worm-500" : ""
+            }`}
+          >
+            {buttonText}
+          </button>
         </Link>
       </div>
     );
@@ -204,7 +220,13 @@ const SentSwapRequestStatusAction = (swap: SwapRequestFullInfo) => {
       <div className="flex flex-col gap-y-5">
         <p>{message}</p>
         <Link href={`/profile/${swap.holder.name}/${swap.id}`}>
-          <button className="primary-btn w-full">{buttonText}</button>
+          <button
+            className={`primary-btn w-full ${
+              status === "ACCEPTED" ? "!bg-inch-worm-500" : ""
+            }`}
+          >
+            {buttonText}
+          </button>
         </Link>
       </div>
     );

@@ -92,7 +92,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   return (
     <div className="flex flex-col gap-y-10 p-10">
       <div className="fixed left-3 top-3 cursor-pointer rounded-small bg-platinum p-2 text-black">
-        <Link href={`/profile/${session.data?.user.name}`}>Volver</Link>
+        <Link href={`/profile/${session.data?.user.name}?view=library`}>Volver</Link>
       </div>
       <Toaster position="top-center" />
       <div className="flex flex-col gap-y-5 border-b-2 border-carisma-400 pb-5">

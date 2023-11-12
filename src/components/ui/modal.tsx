@@ -15,7 +15,7 @@ export default function ModalForm(props: IFormModal) {
             className={`relative flex ${props.style} flex-col rounded-lg border-0  bg-white shadow-lg outline-none focus:outline-none`}
           >
             <div className="flex items-start justify-between rounded-t border-b border-solid border-slate-200 p-5">
-              <h3 className="text-3xl font-semibold">{props.title}</h3>
+              <h3 className="text-3xl font-semibold text-balance">{props.title}</h3>
               <button className="float-right ml-auto border-0 bg-transparent p-1 text-3xl font-semibold leading-none text-black opacity-5 outline-none focus:outline-none"></button>
             </div>
             <div className="relative flex-auto flex-col p-6">

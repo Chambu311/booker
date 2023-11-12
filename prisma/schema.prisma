@@ -56,6 +56,8 @@ model User {
     books            Book[]
     swapsAsRequester SwapRequest[]  @relation("RequesterUser")
     swapsAsHolder    SwapRequest[]  @relation("HolderUser")
+    myReviews        UserReview[]   @relation("ToUser")
+    reviewsPosted    UserReview[]   @relation("FromUser")
     notifications    Notification[]
 }
 
@@ -130,6 +132,19 @@ model Genre {
     id    String @id @default(cuid())
     name  String
     books Book[]
+}
+
+model UserReview {
+    id         String  @id @default(cuid())
+    fromUser   User    @relation("FromUser", fields: [fromUserId], references: [id])
+    fromUserId String
+    toUserId   String
+    toUser     User    @relation("ToUser", fields: [toUserId], references: [id])
+    rating     Float
+    comment    String?
+
+    @@index([fromUserId])
+    @@index([toUserId])
 }
 
 enum Role {

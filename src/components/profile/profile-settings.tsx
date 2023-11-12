@@ -115,7 +115,8 @@ const ProfileSettings = (props: { user: User }) => {
           {edit ? "Cancelar" : "Editar"}
         </p>
       </div>
-      <div className="mt-10 flex gap-10">
+      <div className="mt-10 flex gap-10 relative">
+        <button className="absolute bottom-0 right-10"></button>
         <div className="flex w-[40%] flex-col gap-y-5 rounded-normal p-1">
           <form
             {...form}

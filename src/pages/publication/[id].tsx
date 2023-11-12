@@ -92,7 +92,7 @@ export default function PublicationDetail(props: {
                   Solicitud enviada
                 </div>
               )}
-              <Link href={`/profile/${userQuery?.data?.name}`}>
+              <Link href={`/profile/${userQuery?.data?.name}?view=library`}>
                 <button className="primary-btn">
                   Ver mas publicaciones del usuario
                 </button>

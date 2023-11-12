@@ -2,14 +2,14 @@ import { mdiBell, mdiClose } from "@mdi/js";
 import MdIcon from "./ui/mdIcon";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import { Notification } from "@prisma/client";
+import { Notification, User } from "@prisma/client";
 import { useRouter } from "next/router";
 
-const NotificationDropdown = (props: { userId: string }) => {
+const NotificationDropdown = (props: { user: User }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
   const notificationsQuery = api.notification.getNotSeenByUserId.useQuery({
-    userId: props.userId,
+    userId: props.user?.id,
   });
   const deleteNotificationsMutation =
     api.notification.deleteAllByUserId.useMutation();
@@ -19,8 +19,8 @@ const NotificationDropdown = (props: { userId: string }) => {
     setIsOpen(!isOpen);
   };
 
-  const onClickNotification = () => {
-    return;
+  const onClickNotification = async () => {
+    await router.push(`/profile/${props.user?.name}?view=swaps`);
   };
 
   return (
@@ -53,7 +53,7 @@ const NotificationDropdown = (props: { userId: string }) => {
             <button
               onClick={() =>
                 deleteNotificationsMutation.mutate(
-                  { id: props.userId },
+                  { id: props.user?.id },
                   {
                     onSuccess: async () => {
                       await notificationsQuery.refetch();
