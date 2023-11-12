@@ -115,7 +115,7 @@ export const bookRouter = createTRPCRouter({
   updateBookStatus: protectedProcedure
     .input(
       z.object({
-        status: z.enum(["PUBLISHED", "NOT_PUBLISHED", "SWAPPED"]),
+        status: z.enum(["PUBLISHED", "NOT_PUBLISHED", "SWAPPED", "DELETED"]),
         bookId: z.string(),
       }),
     )
