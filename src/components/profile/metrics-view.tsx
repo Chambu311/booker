@@ -5,6 +5,7 @@ const MetricsView = () => {
   const [tab, setTab] = useState(0);
   const userRanking = api.metrics.getUsersRankedBySwaps.useQuery();
   const genreRanking = api.metrics.getGenresRankedBySwaps.useQuery();
+  const genreRankingData: any[] = genreRanking.data as any[];
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex gap-10">
@@ -52,7 +53,7 @@ const MetricsView = () => {
                       </tr>
                     ))}
                   {tab === 1 &&
-                    genreRanking.data?.map((item, index) => (
+                    genreRankingData?.map((item, index) => (
                       <tr
                         key={index}
                         className="border-b dark:border-neutral-500"
