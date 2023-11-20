@@ -162,7 +162,7 @@ export default function LibraryView(props: {
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
         <div
           ref={animationParent}
-          className="grid max-h-[600px] w-full grid-cols-3 gap-5 overflow-y-auto p-5"
+          className="grid max-h-[600px] w-full xl:grid-cols-3 grid-cols-2 gap-5 overflow-y-auto p-5"
         >
           {bookList?.map((book: BookWithImages) => {
             return (

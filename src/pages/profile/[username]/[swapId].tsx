@@ -31,7 +31,6 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     isPublished: true,
   });
   const booksToChooseFrom = requesterBooksQuery.data;
-  console.log("books to choose", booksToChooseFrom);
   const confirmRequesterSelectionMutation =
     api.swap.confirmRequesterSelection.useMutation();
   const updateRequestMutation = api.swap.updateSwapRequest.useMutation();
@@ -124,7 +123,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
               <p className="text-center text-black">
                 Seleccione el libro por el cual desea intercambiar su libro
               </p>
-              <div className="grid w-full grid-cols-3 place-content-center p-5">
+              <div className="grid w-full xl:grid-cols-3 gird-cols-2 place-content-center p-5">
                 {booksToChooseFrom?.map((book) => (
                   <div
                     key={book.id}

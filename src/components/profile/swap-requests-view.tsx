@@ -74,7 +74,7 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const isSwapAccepted = swap.status === "ACCEPTED";
   return (
     <div
-      className={`banner text-balance flex h-full shadow-normal ${
+      className={`banner text-balance flex h-full text-sm shadow-normal xl:text-[20px] ${
         isSwapOver
           ? "grayscale"
           : isSwapAccepted
@@ -85,19 +85,24 @@ const ReceivedSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
         <div className="flex gap-4 text-[20px]">
           <p>De :</p>
-          <Link href={`/profile/${swap.requester.name}?view=library`} className="text-blue">
+          <Link
+            href={`/profile/${swap.requester.name}?view=library`}
+            className="text-blue"
+          >
             @{swap.requester.name}
           </Link>
         </div>
-        <div className="flex gap-4">
+        <div className="text-balance flex gap-4">
           <p>Su selección :</p>
-          <b>{swap.holderBook.title}</b>
+          <b className="max-w-[150px] xl:max-w-[250px] overflow-hidden overflow-ellipsis whitespace-nowrap">
+            {swap.holderBook.title}
+          </b>
         </div>
         {swap.requesterBook ? (
-          <div className="flex gap-4">
+          <div className="text-balance flex gap-4">
             <p>Tu selección :</p>
-            <b>
-              {swap.requesterBook.title} - {swap.requesterBook.author}
+            <b className="max-w-[150px] xl:max-w-[250px] overflow-hidden overflow-ellipsis whitespace-nowrap">
+              {swap.requesterBook.title}
             </b>
           </div>
         ) : null}
@@ -117,7 +122,7 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
   const isSwapAccepted = swap.status === "ACCEPTED";
   return (
     <div
-      className={`banner text-balance flex h-full shadow-normal ${
+      className={`banner text-balance flex h-full text-sm shadow-normal xl:text-[20px] ${
         isSwapOver
           ? "grayscale"
           : isSwapAccepted
@@ -126,20 +131,27 @@ const SentSwapRequestPreview = (props: { swap: SwapRequestFullInfo }) => {
       }`}
     >
       <div className="flex w-[50%] flex-col gap-y-5 p-5">
-        <div className="flex gap-4 text-[20px]">
+        <div className="flex gap-4">
           <p>Hacia :</p>
-          <Link href={`/profile/${swap.holder.name}?view=library`} className="text-blue">
+          <Link
+            href={`/profile/${swap.holder.name}?view=library`}
+            className="text-blue"
+          >
             @{swap.holder.name}
           </Link>
         </div>
         <div className="flex gap-4">
           <p>Tu selección :</p>
-          <b>{swap.holderBook.title}</b>
+          <b className="max-w-[150px] xl:max-w-[250px] overflow-hidden overflow-ellipsis whitespace-nowrap">
+            {swap.holderBook.title}
+          </b>
         </div>
         {swap.requesterBook ? (
           <div className="flex gap-4">
             <p>Su selección :</p>
-            <b>{swap.requesterBook.title}</b>
+            <b className="max-w-[150px] xl:max-w-[250px] overflow-hidden overflow-ellipsis whitespace-nowrap">
+              {swap.requesterBook.title}
+            </b>
           </div>
         ) : null}
       </div>

@@ -28,8 +28,11 @@ export default function Navbar() {
   return (
     <div className="fixed top-0 z-50 flex  h-[80px] w-full items-center justify-between bg-carisma-400 px-5 text-white">
       <Link href="/home">
-        <div className="absolute left-5 top-0 cursor-pointer font-hayward text-[40px]">
+        <div className="absolute left-5 top-0 hidden cursor-pointer font-hayward text-[40px] xl:block">
           Booker
+        </div>
+        <div className="absolute left-5 top-0 block cursor-pointer font-hayward text-[40px] xl:hidden ">
+          B
         </div>
       </Link>
       <div className="mx-10 flex w-[80%] justify-center">
@@ -50,19 +53,22 @@ export default function Navbar() {
           />
         </Link>
       </div>
-      <div className="flex w-[25%] gap-5 text-white">
+      <div className="flex w-[40%] gap-5 text-white xl:w-[25%]">
         <NotificationDropdown user={session.data?.user as User} />
         <div
           style={{
             backgroundImage: `url('${session.data?.user.image ?? ""}')`,
           }}
-          className="grid place-content-center bg-center bg-cover bg-no-repeat rounded-[50%] border border-white w-14 h-14"
+          className="grid h-10 w-10 place-content-center rounded-[50%] border border-white bg-cover bg-center bg-no-repeat p-5 xl:h-14 xl:w-14"
         >
           {!session.data?.user.image ? (
             <MdIcon path={mdiAccount} size={1} color={"white"} />
           ) : null}
         </div>
-        <Link href={`/profile/${session.data?.user.name}?view=library`} className="my-auto">
+        <Link
+          href={`/profile/${session.data?.user.name}?view=library`}
+          className="my-auto"
+        >
           <div className="text-xl">@{session.data?.user.name}</div>
         </Link>
         <div

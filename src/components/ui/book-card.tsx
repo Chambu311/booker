@@ -16,7 +16,7 @@ export default function BookCard(props: IBookCard) {
   const router = useRouter();
   return (
     <div
-      className="relative h-[300px] w-[250px]"
+      className="relative xl:h-[300px] xl:w-[250px] w-[200px] h-[250px] "
       onMouseEnter={() => setAreOptionsVisible(true)}
       onMouseLeave={() => setAreOptionsVisible(false)}
     >

@@ -71,14 +71,14 @@ const Profile = (props: { user: User }) => {
       <div className="w-full bg-white p-10">
         <div className="flex justify-center gap-10">
           <div className="flex w-[20%] flex-col">
-            <div className="w-full flex-col rounded-[10px] px-10 py-10 shadow-normal">
+            <div className="w-full flex-col rounded-[10px] xl:p-10 p-5 shadow-normal">
               <div className="flex justify-center">
                 <div className="flex-col">
                   <div
                     style={{
                       backgroundImage: `url('${user.image ? user.image : ""}')`,
                     }}
-                    className="mx-auto h-[150px] w-[150px] rounded-[50%] border-[2px]  border-black bg-cover bg-center bg-no-repeat p-5"
+                    className="mx-auto xl:h-[150px] xl:w-[150px] w-[100px] h-[100px] rounded-[50%] border-[2px]  border-black bg-cover bg-center bg-no-repeat p-5"
                   ></div>
                   <div className="relative flex justify-center">
                     <div className="mb-10 mt-5 text-center text-[25px]">
@@ -98,7 +98,7 @@ const Profile = (props: { user: User }) => {
                   </div>
                 </div>
               </div>
-              <ul className="grid grid-cols-1 gap-5 text-[18px]">
+              <ul className="grid grid-cols-1 gap-5  text-sm  text-balance xl:text-[18px]">
                 <li className="flex gap-3 align-middle">
                   <MdIcon path={mdiBook} size={1} color="black" />
                   <span
@@ -112,7 +112,7 @@ const Profile = (props: { user: User }) => {
                 </li>
                 {isMyProfile ? (
                   <>
-                    <li className="flex gap-3">
+                    <li className="flex xl:gap-3 gap-1">
                       <MdIcon
                         path={mdiSwapHorizontalCircleOutline}
                         size={1}
@@ -127,7 +127,7 @@ const Profile = (props: { user: User }) => {
                         Mis intercambios
                       </span>
                     </li>
-                    <li className="flex gap-3">
+                    <li className="flex xl:gap-3 gap-1">
                       <MdIcon path={mdiCog} size={1} color="black" />
                       <span
                         className="cursor-pointer"

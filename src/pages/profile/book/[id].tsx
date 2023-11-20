@@ -45,7 +45,7 @@ export default function PublishBook(props: { book: BookWithImages }) {
         <div className="relative flex flex-col p-10">
           <div
             className="w-20 cursor-pointer rounded-small bg-platinum px-3 text-black"
-            onClick={() => router.push(`/profile/${session.data?.user.name}`)}
+            onClick={() => router.push(`/profile/${session.data?.user.name}?view=library`)}
           >
             Volver
           </div>
