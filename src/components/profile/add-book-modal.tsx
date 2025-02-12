@@ -106,6 +106,7 @@ const AddBookModal = (props: IAddBookModal) => {
               name="description"
               placeholder="Decínos de que se trata"
               maxLength={200}
+              required
               className=" max-h-[200px] w-full rounded-small bg-platinum p-3"
             />
           </div>

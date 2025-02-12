@@ -1,11 +1,9 @@
 import { useSession } from "next-auth/react";
 import Navbar from "~/components/ui/Navbar";
 import MdIcon from "~/components/ui/mdIcon";
-import { mdiAccount, mdiBook, mdiChartBar, mdiCog, mdiStar } from "@mdi/js";
-import Image from "next/image";
-import { mdiBookmarkBoxMultiple } from "@mdi/js";
+import { mdiBook, mdiChartBar, mdiCog, mdiStar } from "@mdi/js";
 import { mdiSwapHorizontalCircleOutline } from "@mdi/js";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import LibraryView from "~/components/profile/library-view";
 import { GetServerSidePropsContext } from "next";
 import { prisma } from "~/server/db";
@@ -16,7 +14,6 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import ModalForm from "~/components/ui/modal";
-import { useForm } from "react-hook-form";
 import { Toaster, toast } from "react-hot-toast";
 import MetricsView from "~/components/profile/metrics-view";
 
