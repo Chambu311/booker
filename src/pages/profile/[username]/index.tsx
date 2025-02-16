@@ -73,7 +73,7 @@ const Profile = (props: { user: User }) => {
                 <div className="flex-col">
                   <div
                     style={{
-                      backgroundImage: `url('${user.image ? user.image : ""}')`,
+                      backgroundImage: `url('${user?.image ? user.image : ""}')`,
                     }}
                     className="mx-auto h-[150px] w-[150px] rounded-[50%] border-[2px]  border-black bg-cover bg-center bg-no-repeat p-5"
                   ></div>

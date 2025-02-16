@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import Carousel from "~/components/ui/carousel";
 import { BookWithImages } from "~/components/ui/book-card";
 import toast, { Toaster } from "react-hot-toast";
+import MainLayout from "~/components/layouts/MainLayout";
 
 export default function PublishBook(props: { book: BookWithImages }) {
   const { book } = props;
@@ -36,16 +37,13 @@ export default function PublishBook(props: { book: BookWithImages }) {
   };
 
   return (
-    <div className="">
-      <Toaster />
-      <header className="pb-20">
-        <Navbar />
-      </header>
-      <div className="grid grid-cols-2">
+    <MainLayout>
+        <Toaster />
+        <div className="grid grid-cols-2">
         <div className="relative flex flex-col p-10">
           <div
             className="w-20 cursor-pointer rounded-small bg-platinum px-3 text-black"
-            onClick={() => router.push(`/profile/${session.data?.user.name}`)}
+            onClick={() => router.push(`/profile/${session.data?.user.name}?view=library`)}
           >
             Volver
           </div>
@@ -61,7 +59,7 @@ export default function PublishBook(props: { book: BookWithImages }) {
                     : "bg-platinum text-black"
                 }`}
               >
-                Estado: {book.status}
+                Estado: {book.status === "PUBLISHED" ? "Publicado" : book.status === "NOT_PUBLISHED" ? "Pausado" : "Intercambiado"}
               </div>
               <div className="">
                 {book.status === "PUBLISHED" ? (
@@ -91,7 +89,7 @@ export default function PublishBook(props: { book: BookWithImages }) {
           <Carousel slides={book?.images ?? []} />
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }
 

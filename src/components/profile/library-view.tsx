@@ -1,7 +1,7 @@
 import { mdiPlus } from "@mdi/js";
 import MdIcon from "../ui/mdIcon";
 import { api } from "~/utils/api";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import Modal from "../ui/modal";
 import BookCard, { BookWithImages, LightBookCard } from "../ui/book-card";
 import { Book } from "@prisma/client";
@@ -12,6 +12,7 @@ import { LoadingSpinner } from "../ui/loading";
 import AWS, { S3 } from "aws-sdk";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useForm } from "react-hook-form";
+import { useDebounce } from "~/utils/hooks";
 
 export default function LibraryView(props: {
   userId: string;
@@ -33,6 +34,18 @@ export default function LibraryView(props: {
     isPublished: !props.isMyUser,
   });
   const bookList = bookQuery.data;
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  // Filter books based on search term
+  const filteredBooks = bookList?.filter((book) => {
+    if (!debouncedSearch) return true;
+    const searchLower = debouncedSearch.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(searchLower) ||
+      book.author.toLowerCase().includes(searchLower)
+    );
+  });
 
   const onClickDeleteBook = (book: BookWithImages) => {
     setSelectedBook(book);
@@ -143,6 +156,7 @@ export default function LibraryView(props: {
     }
     setFileList(undefined);
   };
+
   return (
     <div className="relative max-w-full">
       <Toaster />
@@ -151,20 +165,66 @@ export default function LibraryView(props: {
           className="absolute -bottom-5 right-10 cursor-pointer hover:scale-[1.3]"
           onClick={() => setIsModalOpen(true)}
         >
-          <MdIcon path={mdiPlus} color="black" size={1.5} className="my-aut" />
+          <MdIcon path={mdiPlus} color="black" size={1.5} className="my-auto" />
         </div>
       ) : null}
-      <div className="border-b-[1px] border-b-black pb-2 align-middle text-black">
-        <div className="flex gap-10">
+      
+      <div className="border-b-[1px] border-b-black pb-6 align-middle text-black">
+        <div className="flex flex-col gap-6">
           <span className="text-[35px]">Libreria</span>
+          {!props.isMyUser && (
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar por título o autor..."
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pl-12 text-gray-900 shadow-sm transition-all placeholder:text-gray-400 focus:border-carisma-500 focus:outline-none focus:ring-2 focus:ring-carisma-500/20"
+              />
+              <svg
+                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
       {!bookQuery.isLoading || !bookQuery.isRefetching ? (
         <div
           ref={animationParent}
           className="grid max-h-[600px] w-full grid-cols-3 gap-5 overflow-y-auto p-5"
         >
-          {bookList?.map((book: BookWithImages) => {
+          {filteredBooks?.map((book: BookWithImages) => {
             return (
               <div
                 className="relative flex w-[200px] cursor-pointer flex-col gap-y-4"
@@ -205,6 +265,13 @@ export default function LibraryView(props: {
               </div>
             );
           })}
+          {filteredBooks?.length === 0 && (
+            <div className="col-span-3 mt-8 text-center">
+              <p className="text-lg text-gray-600">
+                No se encontraron libros que coincidan con tu búsqueda
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="mt-40 flex h-full w-full justify-center align-middle">

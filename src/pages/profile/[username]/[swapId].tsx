@@ -12,6 +12,7 @@ import Link from "next/link";
 import confetti from "canvas-confetti";
 import { SwapStatus } from "@prisma/client";
 import { useRouter } from "next/router";
+import { useDebounce } from "~/utils/hooks";
 
 const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const { request } = props;
@@ -22,6 +23,9 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const [selectedBookPreview, setSelectedBookPreview] =
     useState<BookWithImages>();
   const session = useSession();
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
   if (!request) {
     return <LoadingPage />;
   }
@@ -35,6 +39,16 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
   const confirmRequesterSelectionMutation =
     api.swap.confirmRequesterSelection.useMutation();
   const updateRequestMutation = api.swap.updateSwapRequest.useMutation();
+
+  // Filter books based on search
+  const filteredBooks = booksToChooseFrom?.filter((book) => {
+    if (!debouncedSearch) return true;
+    const searchLower = debouncedSearch.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(searchLower) ||
+      book.author.toLowerCase().includes(searchLower)
+    );
+  });
 
   const onClickCloseModal = () => {
     setSelectedBookPreview(undefined);
@@ -90,7 +104,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
     );
   };
   return (
-    <div className="flex flex-col gap-y-10 p-10">
+    <div className="min-h-screen bg-gradient-to-b from-white via-carisma-50/30 to-carisma-100/20">
       <div className="fixed left-3 top-3 cursor-pointer rounded-small bg-platinum p-2 text-black">
         <Link href={`/profile/${session.data?.user.name}?view=library`}>Volver</Link>
       </div>
@@ -109,43 +123,101 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
         </div>
       </div>
       {wasRequestSentToMe && requestStatus === "PENDING_HOLDER" ? (
-        <>
-          <div className="flex items-stretch gap-5">
-            <div className="flex w-[30%] flex-col rounded-normal p-5 shadow-lg">
-              <span className="text-center text-[25px] text-black">
+        <div className="grid gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <div className="h-full rounded-2xl bg-white p-8 shadow-lg transition-all hover:shadow-xl">
+              <h2 className="mb-6 text-center text-2xl font-semibold text-gray-900">
                 Libro seleccionado por {request.requester.name}
-              </span>
-              <div className="flex justify-center p-5">
-                <LightBookCard bookId={request.holderBook.id} />
+              </h2>
+              <div className="flex justify-center">
+                <div className="transform transition-transform hover:scale-105">
+                  <LightBookCard bookId={request.holderBook.id} />
+                </div>
               </div>
             </div>
-            <div className="z-10 flex max-h-full w-[70%] flex-col gap-y-5 overflow-y-auto overflow-x-visible rounded-normal border-2 p-5 shadow-lg">
-              <p className="font-bold">Libreria de @{request.requester.name}</p>
-              <p className="text-center text-black">
-                Seleccione el libro por el cual desea intercambiar su libro
-              </p>
-              <div className="grid w-full grid-cols-3 place-content-center p-5">
-                {booksToChooseFrom?.map((book) => (
+          </div>
+          <div className="lg:col-span-8">
+            <div className="rounded-2xl bg-white p-8 shadow-lg">
+              <div className="mb-8 space-y-6">
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  Libreria de @{request.requester.name}
+                </h2>
+                
+                {/* Search input */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar por título o autor..."
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pl-12 text-gray-900 shadow-sm transition-all placeholder:text-gray-400 focus:border-carisma-500 focus:outline-none focus:ring-2 focus:ring-carisma-500/20"
+                  />
+                  <svg
+                    className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-center text-lg text-gray-600">
+                  Seleccione el libro por el cual desea intercambiar su libro
+                </p>
+              </div>
+
+              {/* Books grid */}
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredBooks?.map((book) => (
                   <div
                     key={book.id}
-                    className="cursor-pointer"
+                    className="group cursor-pointer"
                     onClick={() => setSelectedBookPreview(book)}
                   >
-                    <LightBookCard bookId={book.id} />
+                    <div className="transform transition-all duration-200 group-hover:scale-105 group-hover:shadow-xl">
+                      <LightBookCard bookId={book.id} />
+                    </div>
                   </div>
                 ))}
               </div>
+
+              {/* No results message */}
+              {filteredBooks?.length === 0 && (
+                <div className="mt-8 text-center">
+                  <p className="text-lg text-gray-600">
+                    No se encontraron libros que coincidan con tu búsqueda
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-          <div className="flex justify-center">
-            <button
-              className="primary-btn"
-              onClick={() => onUpdateSwapRequestStatus("CANCELLED")}
-            >
-              Cancelar intercambio
-            </button>
-          </div>
-        </>
+        </div>
       ) : wasRequestSentToMe && requestStatus === "PENDING_REQUESTER" ? (
         <>
           <SwapBooksDetail
@@ -154,7 +226,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
             onSelectBookPreview={onChangeSelectedBookPreview}
           />
           <p className="text-center text-[25px]">Esperando confirmación...</p>
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-20">
             <button className="secondary-btn">Cancelar intercambio</button>
           </div>
           .
@@ -166,7 +238,7 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
             request={request}
             onSelectBookPreview={onChangeSelectedBookPreview}
           />
-          <div className="flex justify-center gap-10">
+          <div className="flex justify-center gap-10 mt-20">
             <button
               onClick={() => onUpdateSwapRequestStatus("ACCEPTED")}
               className="primary-btn"
@@ -190,15 +262,14 @@ const RequestPage = (props: { request: SwapRequestFullInfo }) => {
             wasRequestSentToMe={wasRequestSentToMe}
             onSelectBookPreview={onChangeSelectedBookPreview}
           />
-          <div className="flex justify-center rounded-small">
+          <div className="flex justify-center rounded-small mt-20">
             <p
-              className={`${
-                requestStatus === "ACCEPTED"
+              className={`${requestStatus === "ACCEPTED"
                   ? "primary-btn !bg-green"
                   : "secondary-btn"
-              } pointer-events-none text-[30px]`}
+                } pointer-events-none text-[30px]`}
             >
-              {requestStatus}
+              {requestStatus === "ACCEPTED" ? "Intercambio confirmado" : requestStatus === "CANCELLED" ? "Intercambio cancelado" : "Intercambio rechazado"}
             </p>
           </div>
         </>
@@ -250,32 +321,32 @@ const BookPreviewModal = (props: {
       style="min-w-[600px] min-h-[400px]"
       title={props.book?.title ?? "Preview"}
     >
-        <div className="flex flex-col">
-          <div className="h-[250px] w-full bg-carisma-50">
-            <Carousel slides={images ?? []} />
-          </div>
-          <div className="max-w-[600px] p-5">
-            <p className="max-w-[600px] text-[18px] text-black">
-              {props.book?.description}
-            </p>
-          </div>
-          <div className="mt-5 flex gap-10">
-            {!props.hasSelectionEnded ? (
-              <button
-                onClick={() => props.onConfirm(props.book?.id ?? '')}
-                className="primary-btn"
-              >
-                Confirmar selección
-              </button>
-            ) : null}
-            <button
-              onClick={props.onCloseModal}
-              className="text-[20px] font-bold text-red-500"
-            >
-              Salir
-            </button>
-          </div>
+      <div className="flex flex-col">
+        <div className="h-[250px] w-full bg-carisma-50">
+          <Carousel slides={images ?? []} />
         </div>
+        <div className="max-w-[600px] p-5">
+          <p className="max-w-[600px] text-[18px] text-black">
+            {props.book?.description}
+          </p>
+        </div>
+        <div className="mt-5 flex gap-10">
+          {!props.hasSelectionEnded ? (
+            <button
+              onClick={() => props.onConfirm(props.book?.id ?? '')}
+              className="primary-btn"
+            >
+              Confirmar selección
+            </button>
+          ) : null}
+          <button
+            onClick={props.onCloseModal}
+            className="text-[20px] font-bold text-red-500"
+          >
+            Salir
+          </button>
+        </div>
+      </div>
     </ModalForm>
   );
 };
@@ -288,9 +359,8 @@ const SwapBooksDetail = (props: {
   const { request, onSelectBookPreview, wasRequestSentToMe } = props;
   return (
     <div
-      className={`flex w-full ${
-        !wasRequestSentToMe ? "flex-row-reverse" : "flex-row"
-      } justify-between gap-5 px-10`}
+      className={`flex w-full ${!wasRequestSentToMe ? "flex-row-reverse" : "flex-row"
+        } justify-between gap-5 px-10`}
     >
       <div
         className="flex w-[50%] cursor-pointer flex-col rounded-normal shadow-lg"
