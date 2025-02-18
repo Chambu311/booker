@@ -133,6 +133,7 @@ export default function LibraryView(props: {
           async onSuccess() {
             await bookQuery.refetch();
             setIsModalOpen(false);
+            setFileList(undefined);
             toast.dismiss("create-book");
             form.reset();
           },
@@ -153,12 +154,12 @@ export default function LibraryView(props: {
             await bookQuery.refetch();
             setIsModalOpen(false);
             setSelectedBook(undefined);
+            setFileList(undefined);
             toast.dismiss("create-book");
           },
         },
       );
     }
-    setFileList(undefined);
   };
 
   return (
@@ -172,54 +173,52 @@ export default function LibraryView(props: {
           <MdIcon path={mdiPlus} color="black" size={1.5} className="my-auto" />
         </div>
       ) : null}
-      
+
       <div className="border-b-[1px] border-b-black pb-6 align-middle text-black">
         <div className="flex flex-col gap-6">
           <span className="text-[35px]">Libreria</span>
-          {!props.isMyUser && (
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por título o autor..."
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pl-12 text-gray-900 shadow-sm transition-all placeholder:text-gray-400 focus:border-carisma-500 focus:outline-none focus:ring-2 focus:ring-carisma-500/20"
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por título o autor..."
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pl-12 text-gray-900 shadow-sm transition-all placeholder:text-gray-400 focus:border-carisma-500 focus:outline-none focus:ring-2 focus:ring-carisma-500/20"
+            />
+            <svg
+              className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
-              <svg
-                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            </svg>
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
-          )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

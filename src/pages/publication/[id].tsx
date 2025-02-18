@@ -139,7 +139,7 @@ export default function PublicationDetail(props: {
         {userQuery.data?.reviewsPosted && userQuery.data.reviewsPosted.length > 0 && (
           <div className="w-full rounded-2xl border border-gray-100 bg-white p-6 md:p-8 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Reseñas del usuario
+              Experiencias con este usuario
             </h2>
             
             <div className="space-y-6">

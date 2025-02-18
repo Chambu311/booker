@@ -46,6 +46,8 @@ const AddBookModal = (props: IAddBookModal) => {
         };
       });
       setSlides(images);
+    } else {
+      setSlides([]);
     }
   }, [props.files]);
 

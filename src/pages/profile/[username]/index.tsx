@@ -26,7 +26,7 @@ const Profile = (props: { user: User }) => {
   const router = useRouter();
   const session = useSession();
   const searchParams = useSearchParams();
-  const tabView = searchParams.get("view") ?? null;
+  const tabView = searchParams?.get("view") ?? null;
   const isMyProfile = session.data?.user.id === props.user?.id;
   const reviewsRatingQuery = api.userReview.getUserReviewsRating.useQuery({
     userId: user?.id,

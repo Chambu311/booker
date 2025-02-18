@@ -7,10 +7,6 @@ import {
 } from "~/server/api/trpc";
 import { error } from "console";
 import { TRPCError } from "@trpc/server";
-import { PrismaClient } from "@prisma/client";
-import AWS from "aws-sdk";
-import { env } from "~/env.mjs";
-import s3 from "~/utils/s3";
 
 export const userRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
@@ -111,33 +107,5 @@ export const userRouter = createTRPCRouter({
         },
         data: updateInput,
       });
-    }),
-  uploadImage: publicProcedure
-    .input(z.object({
-      file: z.object({
-        type: z.string(),
-        base64: z.string(),
-      }),
-      userName: z.string(),
-    }))
-    .mutation(async ({ input }) => {
-      const base64Data = input.file.base64.split(',')[1];
-      if (!base64Data) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid base64 image format",
-        });
-      }
-      const buffer = Buffer.from(base64Data, 'base64');
-      const uploadResult = await s3
-        .upload({
-          Bucket: "booker-tesis",
-          Body: buffer,
-          Key: `booker-avatar-${input.userName}-${crypto.randomUUID()}`,
-          ContentType: input.file.type,
-        })
-        .promise();
-
-      return uploadResult.Location;
     }),
 });

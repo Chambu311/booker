@@ -28,9 +28,6 @@ const ProfileSettings = (props: { user: User }) => {
   const [url, setUrl] = useState<string>(user.image ?? '');
   const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
   const [edit, setEdit] = useState(false);
-
-  const uploadImageMutation = api.user.uploadImage.useMutation();
-
   const parseErrorMessage = (message: string) => {
     if (message.includes("Username")) {
       return "El nombre de usuario ingresado ya existe, seleccione otro";
