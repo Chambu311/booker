@@ -121,6 +121,7 @@ export const swapRouter = createTRPCRouter({
       z.object({ id: z.string(), filter: z.enum(["ALL", "RECEIVED", "SENT"]) }),
     )
     .query(async ({ ctx, input }) => {
+      console.log("input", input);
       if (input.filter === "ALL") {
         return await getAllSwapRequestsByUserId(ctx.prisma, input.id);
       } else if (input.filter === "SENT") {
@@ -190,6 +191,7 @@ export const swapRouter = createTRPCRouter({
 });
 
 const getAllSwapRequestsByUserId = async (prisma: PrismaClient, id: string) => {
+  console.log("id", id);
   return await prisma.swapRequest.findMany({
     where: {
       OR: [
@@ -214,6 +216,7 @@ const getAllSwapRequestsByUserId = async (prisma: PrismaClient, id: string) => {
 };
 
 const getSentSwapRequestByUserId = async (prisma: PrismaClient, id: string) => {
+  console.log("id", id);
   return await prisma.swapRequest.findMany({
     where: {
       requesterId: id,

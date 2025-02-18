@@ -14,6 +14,7 @@ const SwapRequestsView = (props: { user: User }) => {
     filter,
   });
   const swaps = swapRequestsQuery.data;
+  console.log(swaps);
 
   const wasSwapSentToMe = (holderId: string) => {
     return session.data?.user.id === holderId;

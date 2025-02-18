@@ -1,16 +1,8 @@
 import { Book, BookStatus } from "@prisma/client";
 import { prisma } from "~/server/db";
 import { GetServerSidePropsContext } from "next";
-import Navbar from "~/components/ui/Navbar";
-import AWS, { S3 } from "aws-sdk";
-import { v4 as uuid } from "uuid";
-import { ChangeEvent, useState } from "react";
-import { mdiLoading } from "@mdi/js";
 import { api } from "~/utils/api";
-import Image from "next/image";
-import MdIcon from "~/components/ui/mdIcon";
 import { useRouter } from "next/router";
-import { LoadingPage } from "~/components/ui/loading";
 import { useSession } from "next-auth/react";
 import Carousel from "~/components/ui/carousel";
 import { BookWithImages } from "~/components/ui/book-card";

@@ -3,12 +3,10 @@ import {
   BookWithImages,
 } from "~/components/ui/book-card";
 import { prisma } from "~/server/db";
-import Image from "next/image";
-import Navbar from "~/components/ui/Navbar";
 import { api } from "~/utils/api";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { LoadingPage, LoadingSpinner } from "~/components/ui/loading";
+import { LoadingSpinner } from "~/components/ui/loading";
 import toast, { Toaster } from "react-hot-toast";
 import Carousel from "~/components/ui/carousel";
 import MainLayout from "~/components/layouts/MainLayout";
@@ -34,7 +32,7 @@ export default function PublicationDetail(props: {
     holderBookId: book?.id,
   });
   const newSwapMutation = api.swap.createInitialSwapRequest.useMutation();
-
+  console.log("book user id", book.userId);
   const onClickSendSwapRequest = () => {
     newSwapMutation.mutate(
       {

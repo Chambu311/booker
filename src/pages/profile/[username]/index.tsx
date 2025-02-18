@@ -16,6 +16,7 @@ import { api } from "~/utils/api";
 import ModalForm from "~/components/ui/modal";
 import { Toaster, toast } from "react-hot-toast";
 import MetricsView from "~/components/profile/metrics-view";
+import MainLayout from "~/components/layouts/MainLayout";
 
 const Profile = (props: { user: User }) => {
   const { user } = props;
@@ -60,10 +61,7 @@ const Profile = (props: { user: User }) => {
     );
   };
   return (
-    <>
-      <header className="pb-20">
-        <Navbar />
-      </header>
+    <MainLayout>
       <Toaster />
       <div className="w-full bg-white p-10">
         <div className="flex justify-center gap-10">
@@ -239,7 +237,7 @@ const Profile = (props: { user: User }) => {
           </div>
         </ModalForm>
       </div>
-    </>
+    </MainLayout>
   );
 };
 

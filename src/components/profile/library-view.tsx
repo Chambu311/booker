@@ -1,7 +1,7 @@
 import { mdiPlus } from "@mdi/js";
 import MdIcon from "../ui/mdIcon";
 import { api } from "~/utils/api";
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, useState } from "react";
 import Modal from "../ui/modal";
 import BookCard, { BookWithImages, LightBookCard } from "../ui/book-card";
 import { Book } from "@prisma/client";
@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import AddBookModal, { CreateBookInput } from "./add-book-modal";
 import toast, { Toaster } from "react-hot-toast";
 import { LoadingSpinner } from "../ui/loading";
-import AWS, { S3 } from "aws-sdk";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useForm } from "react-hook-form";
 import { useDebounce } from "~/utils/hooks";
@@ -92,29 +91,34 @@ export default function LibraryView(props: {
       return;
     }
     toast.loading("Guardando...", {
-        id: "create-book",
+      id: "create-book",
     });
 
-    if (fileList)  {
-        AWS.config.update({
-          accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-        });
-        const s3 = new S3();
+    if (fileList) {
+      try {
         for (const file of [...fileList]) {
-          const uploadResult = await s3
-            .upload({
-              Bucket: "booker-tesis",
-              Body: file,
-              Key: `booker-image-${data.title}-${crypto.randomUUID()}`,
-              ContentType: "image/png",
-            })
-            .promise();
-    
-          const img = uploadResult.Location;
-          keys.push(img);
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const response = await fetch("/api/upload/pinata", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Upload failed");
+          }
+
+          const result = await response.json();
+          keys.push(result.url);
         }
+      } catch (error) {
+        toast.dismiss("create-book");
+        toast.error("Error al subir las imágenes");
+        return;
+      }
     }
+
     if (!selectedBook) {
       bookMutation.mutate(
         {

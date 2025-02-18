@@ -1,13 +1,11 @@
 import { User } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import bcrypt from "bcryptjs";
 import MdIcon from "../ui/mdIcon";
 import { mdiEye, mdiPlus } from "@mdi/js";
 import { api } from "~/utils/api";
 import { toast, Toaster } from "react-hot-toast";
-import { useSession, signOut } from "next-auth/react";
-import AWS, { S3 } from "aws-sdk";
+import { signOut } from "next-auth/react";
 
 type UserFormValues = {
   email: string;
@@ -31,6 +29,8 @@ const ProfileSettings = (props: { user: User }) => {
   const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
   const [edit, setEdit] = useState(false);
 
+  const uploadImageMutation = api.user.uploadImage.useMutation();
+
   const parseErrorMessage = (message: string) => {
     if (message.includes("Username")) {
       return "El nombre de usuario ingresado ya existe, seleccione otro";
@@ -40,9 +40,11 @@ const ProfileSettings = (props: { user: User }) => {
   };
 
   const handleFileUploadchange = (e: any) => {
-    setPicture([...e.target.files].at(0));
-    const files = [...e.target.files];
-    const url = URL.createObjectURL(files.at(0));
+    const file = [...e.target.files].at(0);
+    if (!file) return;
+
+    setPicture(file);
+    const url = URL.createObjectURL(file);
     setUrl(url);
   };
 
@@ -50,28 +52,38 @@ const ProfileSettings = (props: { user: User }) => {
     toast.loading("Guardando...", {
       id: "loading",
     });
-    AWS.config.update({
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    });
+
     let img = undefined;
     if (picture) {
-      const s3 = new S3();
-      const uploadResult = await s3
-        .upload({
-          Bucket: "booker-tesis",
-          Body: picture,
-          Key: `booker-avatar-${user.name}-${crypto.randomUUID()}`,
-          ContentType: "image/png",
-        })
-        .promise();
-      img = uploadResult.Location;
+      try {
+        const formData = new FormData();
+        formData.append("file", picture);
+
+        const response = await fetch("/api/upload/pinata", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const result = await response.json();
+        console.log("result", result.url);
+        img = result.url;
+      } catch (error) {
+        toast.dismiss("loading");
+        toast.error("Error al subir la imagen");
+        return;
+      }
     }
+
     userMutation.mutate(
       {
         ...data,
         id: user.id,
         picture: img,
+        isSettings: true,
       },
       {
         onSuccess: () => {
