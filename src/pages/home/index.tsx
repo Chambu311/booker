@@ -18,12 +18,12 @@ const options = {
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedGenre = searchParams.get("genre");
-  const searchValue = searchParams.get("search");
+  const selectedGenre = searchParams?.get("genre");
+  const searchValue = searchParams?.get("search");
   const session = useSession();
   const booksQuery = api.book.getBooksFeed.useQuery({
     userId: session.data?.user.id ?? "",
-    genre: selectedGenre,
+    genre: selectedGenre ?? null,
   });
   const genreQuery = api.genre.getAll.useQuery();
   const genres = genreQuery.data;
