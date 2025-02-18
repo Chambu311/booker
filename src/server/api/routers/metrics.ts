@@ -57,4 +57,21 @@ export const metricsRouter = createTRPCRouter({
     `;
     return ranking;
   }),
+  getBooksUploadedPerUser: protectedProcedure.query(async ({ ctx }) => {
+    const ranking: any[] = await ctx.prisma.$queryRaw`
+      SELECT 
+        u.name,
+        COUNT(b.id) as bookCount
+      FROM 
+        User u
+      LEFT JOIN 
+        Book b ON u.id = b.userId AND b.status != 'DELETED'
+      GROUP BY 
+        u.id, u.name
+      ORDER BY 
+        bookCount DESC
+      LIMIT 10
+    `;
+    return ranking;
+  }),
 });
